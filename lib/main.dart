@@ -1,6 +1,8 @@
+import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'widgets/features/login_buttons.dart';
-
+import 'utils/colors.dart';
+import 'widgets/features/menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,12 +13,16 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) { return MaterialApp( title: 'Flutter Demo', theme: ThemeData( // This is the theme of your application. TRY THIS: Try running your application with "flutter run". You'll see the application has a purple toolbar. Then, without quitting the app, try changing the seedColor in the colorScheme below to Colors.green and then invoke "hot reload" (save your changes or press the "hot reload" button in a Flutter-supported IDE, or press "r" if you used the command line to start the app). Notice that the counter didn't reset back to zero; the application state is not lost during the reload. To reset the state, use hot
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application. TRY THIS: Try running your application with "flutter run". You'll see the application has a purple toolbar. Then, without quitting the app, try changing the seedColor in the colorScheme below to Colors.green and then invoke "hot reload" (save your changes or press the "hot reload" button in a Flutter-supported IDE, or press "r" if you used the command line to start the app). Notice that the counter didn't reset back to zero; the application state is not lost during the reload. To reset the state, use hot
         // restart instead.
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        scaffoldBackgroundColor: Color(0xffCF0A0A),
+        scaffoldBackgroundColor: pRed,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -41,7 +47,7 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
-}
+  }
 
 class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
@@ -79,13 +85,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 textAlign: TextAlign.center,
               ),
- ButtonColumnWidget(
+              CustomFormWidget(),
+              ButtonColumnWidget(
                 onLoginPressed: () {
                   // Define what happens when the login button is pressed
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MenuPage()),
+                  );
                   print('Login button pressed');
                 },
                 onSignUpPressed: () {
-                  // Define what happens when the sign-up button is pressed
+                  // Define what the sign-up button is pressed
                   print('Sign Up button pressed');
                 },
               ),
