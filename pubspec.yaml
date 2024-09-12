@@ -68,15 +68,15 @@ flutter:
   # https://flutter.dev/to/resolution-aware-images
 
   # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
+  # https://flutter.dev/to/asset-from-package'
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - assets/fonts/
+  #fonts:
+    #  - assets/fonts/
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

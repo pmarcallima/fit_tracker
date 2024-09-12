@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'widgets/features/login_buttons.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -77,67 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20), // Espaço entre o texto e os botões
-              Form(
-                
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Column(
-                  children: [
-                         TextFormField(
-                          decoration: InputDecoration(
-                            iconColor: Color(0xffEEEEEE),
-                            fillColor: Color(0xffEEEEEE),
-                            filled: true,
-                            labelText: 'Username',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-              SizedBox(height: 15), // Espaço entre o texto e os botões
-                         TextFormField(
-                          decoration: InputDecoration(
-                            iconColor: Color(0xffDC5F00),
-                            fillColor: Color(0xffEEEEEE),
-                            filled: true,
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                  ],
-                ),
-                ),
-              ),
-              SizedBox(height: 20), // Espaço entre o texto e os botões
-              Column(
-                mainAxisSize: MainAxisSize.min, // Ajusta o tamanho dos botões
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      // Defina o que acontece quando o botão é pressionado
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                      foregroundColor: Colors.red,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    child: Text('Fazer login'),
-                  ),
-                  SizedBox(height: 8.0), // Espaço entre os botões
-                  ElevatedButton(
-                    onPressed: () {
-                      // Defina o que acontece quando o botão é pressionado
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:Color(0xff363636),
-                      foregroundColor: Colors.white,
-            
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    child: Text('Criar uma conta'),
-                  ),
-                ],
+ ButtonColumnWidget(
+                onLoginPressed: () {
+                  // Define what happens when the login button is pressed
+                  print('Login button pressed');
+                },
+                onSignUpPressed: () {
+                  // Define what happens when the sign-up button is pressed
+                  print('Sign Up button pressed');
+                },
               ),
             ],
           ),
