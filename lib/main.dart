@@ -1,6 +1,7 @@
 import 'package:fit_tracker/pages/tabs/home.dart';
 import 'package:fit_tracker/pages/tabs/login.dart';
 import 'package:fit_tracker/utils/images.dart';
+import 'package:fit_tracker/widgets/features/home_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'widgets/features/login_buttons.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        scaffoldBackgroundColor: pRed,
+        scaffoldBackgroundColor: pDarkRed,
         colorScheme: ColorScheme.fromSeed(seedColor: pDarkerRed,),
         useMaterial3: true,
       ),
@@ -89,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
 
               SizedBox(height:30),
-              ButtonColumnWidget(),
+              HomeButtons(),
             ],
           ),
         ),
