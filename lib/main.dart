@@ -1,3 +1,6 @@
+import 'package:fit_tracker/pages/tabs/home.dart';
+import 'package:fit_tracker/pages/tabs/login.dart';
+import 'package:fit_tracker/utils/images.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'widgets/features/login_buttons.dart';
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         scaffoldBackgroundColor: pRed,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: pDarkerRed,),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -32,14 +35,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -55,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
       ),
       body: Center(
         child: Container(
@@ -85,21 +79,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              CustomFormWidget(),
-              ButtonColumnWidget(
-                onLoginPressed: () {
-                  // Define what happens when the login button is pressed
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MenuPage()),
-                  );
-                  print('Login button pressed');
-                },
-                onSignUpPressed: () {
-                  // Define what the sign-up button is pressed
-                  print('Sign Up button pressed');
-                },
+              //CustomFormWidget(),
+              SizedBox(height:30),
+
+         new Image.asset(LOGO, 
+                fit: BoxFit.fitHeight,
+                width:300,
+                
               ),
+
+              SizedBox(height:30),
+              ButtonColumnWidget(),
             ],
           ),
         ),
