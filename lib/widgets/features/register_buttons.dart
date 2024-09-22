@@ -1,21 +1,21 @@
-import 'package:fit_tracker/pages/tabs/home.dart';
-import 'package:fit_tracker/pages/tabs/login.dart';
+
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 
-class HomeButtons extends StatelessWidget {
+class RegisterButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return Container(
-      width: screenSize.width / 2.5,
+      width: screenSize.width/3,
       child: Column(
         mainAxisSize: MainAxisSize.min, // Adjusts the size of the buttons
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/login');
+
+                Navigator.pushNamed(context, '/home');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: pWhite,
@@ -25,13 +25,8 @@ class HomeButtons extends StatelessWidget {
             child: Text('Fazer login'),
           ),
           SizedBox(height: 8.0), // Space between buttons
-
           ElevatedButton(
-            onPressed: () {
-
-              Navigator.pushNamed(context, '/register');
-
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: pLightBlack,
               foregroundColor: pWhite,

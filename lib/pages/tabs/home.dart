@@ -1,35 +1,66 @@
+import 'package:fit_tracker/utils/images.dart';
+import 'package:fit_tracker/widgets/features/home_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 
 
-class LoginPage extends StatefulWidget {
+class HomePage extends StatefulWidget {
+  final String title;
 
-  const LoginPage({super.key});
+  const HomePage({super.key, required this.title});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
-
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-
-  @override
+class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Center(
-        child: Column(
-          children: [
-        
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // Texto centralizado
+              Text.rich(
+                TextSpan(
+                  text: 'FitTracker', // texto padrão
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 24,
+                    color: Colors.white,
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text:
+                          '\nDesafie amigos, \nalcance metas e ganhem juntos!',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 30),
 
-         LoginForm(),
-],
+              Image.asset(
+                LOGO,
+                fit: BoxFit.fitHeight,
+                width: 300,
+              ),
+
+              SizedBox(height: 30),
+              HomeButtons(),
+            ],
           ),
-        ),
+      ),
     );
   }
 }
