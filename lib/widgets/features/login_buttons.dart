@@ -15,8 +15,7 @@ class ButtonColumnWidget extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/workouts');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: pWhite,
