@@ -1,5 +1,5 @@
 
-import 'package:fit_tracker/widgets/features/workoutlist.dart';
+import 'package:fit_tracker/widgets/features/workout_list.dart';
 import 'package:flutter/material.dart';
 
 

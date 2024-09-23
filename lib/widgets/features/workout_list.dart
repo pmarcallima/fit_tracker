@@ -1,6 +1,5 @@
 
-
-import 'package:fit_tracker/utils/colors.dart'; 
+import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 class Exercise {
@@ -35,8 +34,28 @@ class _WorkoutListState extends State<WorkoutList> {
     ),
   );
 
+  @override
+  void initState() {
+    super.initState();
+    // Simulando um useEffect que escuta mudanças no workout
+    _monitorWorkoutChanges();
+  }
+
+  // Função que "monitora" as mudanças em workout
+  void _monitorWorkoutChanges() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        // Isso força uma atualização na tela
+      });
+      for (var workout in workouts) {
+        debugPrint('Monitorei o treino: ${workout.title}');
+      }
+    });
+  }
+
   void _showEditDialog(Exercise exercise, StateSetter updateParentState) {
-    TextEditingController controller = TextEditingController(text: exercise.title);
+    TextEditingController controller =
+        TextEditingController(text: exercise.title);
 
     showDialog(
       context: context,
@@ -53,14 +72,14 @@ class _WorkoutListState extends State<WorkoutList> {
                 setState(() {
                   exercise.title = controller.text;
                 });
-                updateParentState(() {});
-                Navigator.of(context).pop(); 
+                updateParentState( () {});
+                Navigator.of(context).pop();
               },
               child: const Text('Salvar'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
               child: const Text('Cancelar'),
             ),
@@ -70,8 +89,9 @@ class _WorkoutListState extends State<WorkoutList> {
     );
   }
 
-  void _showWorkoutPopup(BuildContext context, Workout workout) {
-    TextEditingController workoutController = TextEditingController(text: workout.title);
+  void _showWorkoutPopup(BuildContext context, Workout workout, int workoutIndex) {
+    TextEditingController workoutController =
+        TextEditingController(text: workout.title);
 
     showDialog(
       context: context,
@@ -84,7 +104,7 @@ class _WorkoutListState extends State<WorkoutList> {
                 decoration: const InputDecoration(labelText: 'Título do Treino'),
               ),
               content: SizedBox(
-                height: 300, 
+                height: 300,
                 width: double.maxFinite,
                 child: ListView.builder(
                   itemCount: workout.exercises.length,
@@ -93,6 +113,9 @@ class _WorkoutListState extends State<WorkoutList> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
                         title: Text(exercise.title),
                         onTap: () {
                           _showEditDialog(exercise, setState);
@@ -106,15 +129,17 @@ class _WorkoutListState extends State<WorkoutList> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      workout.title = workoutController.text; 
+                      workout.title = workoutController.text;
                     });
-                    Navigator.of(context).pop(); 
+                    // Chama a função de monitoramento após salvar
+                    _monitorWorkoutChanges();
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Salvar'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); 
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Fechar'),
                 ),
@@ -129,6 +154,7 @@ class _WorkoutListState extends State<WorkoutList> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
     return Container(
       width: screenSize.width / 1.5,
       height: screenSize.height / 1.5,
@@ -136,12 +162,18 @@ class _WorkoutListState extends State<WorkoutList> {
         itemCount: workouts.length,
         itemBuilder: (context, index) {
           final workout = workouts[index];
+
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
               tileColor: pLightGray,
               title: Text(workout.title),
-              onTap: () => _showWorkoutPopup(context, workout),
+              onTap: () {
+                _showWorkoutPopup(context, workout, index);
+              },
             ),
           );
         },
