@@ -1,6 +1,6 @@
-
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 class Exercise {
   String title;
@@ -15,14 +15,14 @@ class Workout {
   Workout(this.title, this.exercises);
 }
 
-class WorkoutList extends StatefulWidget {
-  const WorkoutList({super.key});
+class WorkoutListT extends StatefulWidget {
+  const WorkoutListT({super.key});
 
   @override
-  State<WorkoutList> createState() => _WorkoutListState();
+  State<WorkoutListT> createState() => _WorkoutListState();
 }
 
-class _WorkoutListState extends State<WorkoutList> {
+class _WorkoutListState extends State<WorkoutListT> {
   final workouts = List<Workout>.generate(
     10,
     (i) => Workout(
@@ -54,42 +54,75 @@ class _WorkoutListState extends State<WorkoutList> {
   }
 
   void _showEditDialog(Exercise exercise, StateSetter updateParentState) {
-    TextEditingController controller =
+    var screenSize = MediaQuery.of(context).size;
+
+    TextEditingController exerciseController =
         TextEditingController(text: exercise.title);
 
-    showDialog(
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Editar Exercício'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(hintText: "Digite o novo nome"),
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 700,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: screenSize.width / 2,
+                child: TextField(
+                  controller: exerciseController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                  ),
+                ),
+              ),
+              SizedBox(height: 50),
+              IconButton(
+                iconSize: 100,
+                icon: Icon(Icons.file_upload_outlined),
+                onPressed: () async {
+                  var picked = await FilePicker.platform.pickFiles();
+
+                  if (picked != null) {
+                    print(picked.files.first.name);
+                  }
+                },
+              ),
+
+              SizedBox(height: 50),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      child: const Text('Salvar'),
+                      onPressed: () {
+                        setState(() {
+                          exercise.title = exerciseController.text;
+                        });
+                        updateParentState(() {});
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    ElevatedButton(
+                      child: const Text('Fechar'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+         
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  exercise.title = controller.text;
-                });
-                updateParentState( () {});
-                Navigator.of(context).pop();
-              },
-              child: const Text('Salvar'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
-            ),
-          ],
         );
       },
     );
   }
 
-  void _showWorkoutPopup(BuildContext context, Workout workout, int workoutIndex) {
+  void _showWorkoutPopup(
+      BuildContext context, Workout workout, int workoutIndex) {
     TextEditingController workoutController =
         TextEditingController(text: workout.title);
 
@@ -101,7 +134,8 @@ class _WorkoutListState extends State<WorkoutList> {
             return AlertDialog(
               title: TextField(
                 controller: workoutController,
-                decoration: const InputDecoration(labelText: 'Título do Treino'),
+                decoration:
+                    const InputDecoration(labelText: 'Título do Treino'),
               ),
               content: SizedBox(
                 height: 300,

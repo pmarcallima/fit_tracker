@@ -1,5 +1,6 @@
 
 import 'package:fit_tracker/widgets/features/workout_list.dart';
+import 'package:fit_tracker/widgets/features/workout_list_test.dart';
 import 'package:flutter/material.dart';
 
 
@@ -36,7 +37,7 @@ class _WorkoutsPageState extends State<WorkoutsPage> {
               ),
               SizedBox(height: 30),
 
-            WorkoutList(),
+              WorkoutListT(),
 
             ],
           ),
