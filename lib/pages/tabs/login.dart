@@ -1,6 +1,7 @@
 import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/utils/colors.dart';
+import 'package:fit_tracker/widgets/global/appbar.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -15,13 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 140,
-        title: Text('Login'),
-        foregroundColor: pWhite,
-        titleTextStyle: TextStyle(fontSize: 30),
-        centerTitle: true,
-        backgroundColor: pRed,
+      appBar: CustomAppBar(
+titleText: 'Login',
       ),
       body: Center(
         child: Form(
