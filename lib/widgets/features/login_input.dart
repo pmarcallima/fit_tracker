@@ -24,10 +24,7 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
               labelText: 'Usuário',
               border: OutlineInputBorder(),
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty)
-                return 'Please enter your email';
-            }),
+            ),
         SizedBox(height: 15), // Space between fields
         TextFormField(
           decoration: InputDecoration(

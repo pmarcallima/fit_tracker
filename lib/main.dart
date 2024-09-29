@@ -28,10 +28,7 @@ class MyApp extends StatelessWidget {
       },
       theme: ThemeData(
 
-        scaffoldBackgroundColor: pDarkRed,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: pDarkerRed,
-        ),
+        scaffoldBackgroundColor: Color(0xFFEEE6E7),
         useMaterial3: true,
       ),
       home: HomePage(title: 'Fit Tracker'),

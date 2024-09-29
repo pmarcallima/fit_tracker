@@ -18,8 +18,8 @@ class HomeButtons extends StatelessWidget {
               Navigator.pushNamed(context, '/login');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: pWhite,
-              foregroundColor: pLightRed,
+              backgroundColor: pDarkRed,
+              foregroundColor: pWhite,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             child: Text('Fazer login'),

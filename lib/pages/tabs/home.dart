@@ -6,6 +6,7 @@ import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:fit_tracker/utils/colors.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -21,10 +22,20 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Center(
+      body: Stack(
+      children: [ 
+Container(
+width: screenSize.width,
+            height: screenSize.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(BACKGROUND), // Path to your image
+                fit: BoxFit.fill, // Adjust to cover the entire screen
+              ),
+            ),
+          ),
+
+          Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -35,7 +46,7 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.blackHanSans(
                     fontStyle: FontStyle.italic,
                     fontSize: 40,
-                    color: Colors.white,
+                    color: pWhite,
                   ),
                   children: <TextSpan>[
                     TextSpan(
@@ -53,7 +64,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 30),
 
               Image.asset(
-                LOGO2,
+                LOGO,
                 fit: BoxFit.fitHeight,
                 width: 300,
               ),
@@ -62,6 +73,8 @@ class _HomePageState extends State<HomePage> {
               HomeButtons(),
             ],
           ),
+      ),
+        ],
       ),
     );
   }

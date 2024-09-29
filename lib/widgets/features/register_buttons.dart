@@ -18,8 +18,8 @@ class RegisterButtons extends StatelessWidget {
                 Navigator.pushNamed(context, '/home');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: pWhite,
-              foregroundColor: pLightRed,
+              backgroundColor: pRed,
+              foregroundColor: pWhite,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             child: Text('Fazer login'),

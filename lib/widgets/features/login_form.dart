@@ -2,6 +2,7 @@ import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/widgets/features/login_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -22,17 +23,20 @@ class _LoginFormState extends State<LoginForm> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+
             Text.rich(
               TextSpan(
-                text: 'Faça login', // texto padrão
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 24,
-                  color: pWhite,
+                text: 'Bem vindo de volta', // texto padrão
+
+                  style: GoogleFonts.blackHanSans(
+                    fontSize: 22,
+
+                  color: pDarkRed,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 50),
+            SizedBox(height: 120),
             CustomFormWidget(),
             SizedBox(height: 30),
             ButtonColumnWidget(),

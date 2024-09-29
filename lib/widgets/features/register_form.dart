@@ -5,6 +5,7 @@ import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:fit_tracker/widgets/features/register_buttons.dart';
 import 'package:fit_tracker/widgets/features/register_input.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -25,16 +26,19 @@ class _RegisterFormState extends State<RegisterForm> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+
             Text.rich(
               TextSpan(
-                text: 'Faça seu cadastro', // texto padrão
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 24,
-                  color: pWhite,
+                text: 'Bem vindo', // texto padrão
+
+                  style: GoogleFonts.blackHanSans(
+                    fontSize: 22,
+
+                  color: pDarkRed,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ),
-            ),
             SizedBox(height: 50),
             RegisterInput(),
             SizedBox(height: 30),

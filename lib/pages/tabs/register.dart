@@ -1,6 +1,7 @@
 import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:fit_tracker/widgets/features/register_form.dart';
 import 'package:flutter/material.dart';
+import 'package:fit_tracker/utils/colors.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -16,7 +17,13 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+
+        toolbarHeight: 140,
+        title: Text('Cadastro'),
+        foregroundColor: pWhite,
+        titleTextStyle: TextStyle(fontSize: 30),
+        centerTitle: true,
+        backgroundColor: pRed,
       ),
       body: Center(
         child: Form(

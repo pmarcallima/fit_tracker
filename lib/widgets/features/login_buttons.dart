@@ -18,18 +18,18 @@ class ButtonColumnWidget extends StatelessWidget {
                 Navigator.pushNamed(context, '/workouts');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: pWhite,
-              foregroundColor: pLightRed,
+              backgroundColor: pRed,
+              foregroundColor: pLightGray,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             child: Text('Fazer login'),
           ),
-          SizedBox(height: 8.0), // Space between buttons
+          SizedBox(height: 10.0), // Space between buttons
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: pLightBlack,
-              foregroundColor: pWhite,
+              foregroundColor: pLightGray,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
             child: Text('Criar uma conta'),
