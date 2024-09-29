@@ -8,5 +8,6 @@ const Color pRed = Color(0xffBA181B);
 const Color pLightRed = Color(0xffE5383B);
 const Color pDarkGray= Color(0xffB1A7A6);
 const Color pGray= Color(0xffD3D3D3);
+const Color pLightGray2= Color(0xffefefef);
 const Color pLightGray= Color(0xffF5F3F4);
 const Color pWhite= Color(0xffFFFFFF);

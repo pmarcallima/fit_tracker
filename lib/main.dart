@@ -2,7 +2,9 @@ import 'package:fit_tracker/pages/tabs/home.dart';
 import 'package:fit_tracker/pages/tabs/login.dart';
 import 'package:fit_tracker/pages/tabs/register.dart';
 import 'package:fit_tracker/pages/tabs/workouts.dart';
+import 'package:fit_tracker/pages/tabs/personalData.dart';
 import 'package:flutter/material.dart';
+import 'pages/tabs/login.dart';
 import 'utils/colors.dart';
 
 void main() {
@@ -22,6 +24,7 @@ class MyApp extends StatelessWidget {
         '/home': (BuildContext context) => HomePage(title: 'Fit Tracker'),
         '/register': (BuildContext context) => RegisterPage(),
         '/workouts': (BuildContext context) => WorkoutsPage(),
+        '/personalData': (BuildContext context) => PersonalDataPage(),
       },
       theme: ThemeData(
 
