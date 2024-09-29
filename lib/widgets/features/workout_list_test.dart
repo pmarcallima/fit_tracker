@@ -74,7 +74,7 @@ class _WorkoutListState extends State<WorkoutListT> {
                   controller: exerciseController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Password',
+                    labelText: 'Exercicio',
                   ),
                 ),
               ),
