@@ -1,6 +1,7 @@
 import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/utils/colors.dart';
+import 'package:flutter_svg/svg.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final String titleText;
   final IconData icon;
@@ -11,14 +12,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   Widget build(BuildContext context) {
 
     return
+
 Stack(
       children: [
         Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(BACKGROUND), 
-              fit: BoxFit.fill, 
-            ),
+  child: SvgPicture.asset(
+            BACKGROUND, // Usando SvgPicture para carregar a imagem
+            fit: BoxFit.cover, // Ajusta a imagem para cobrir toda a área
+            width: double.infinity, // Largura total
           ),
         ),
 
@@ -44,32 +45,6 @@ Stack(
         centerTitle: true,
         backgroundColor: Colors.transparent,
       
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.checklist),
-          tooltip: 'Treinos',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/workouts');
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.group),
-          tooltip: 'Amigos',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/');
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.account_circle),
-          tooltip: 'Perfil',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/personalData');
-          },
-        ),
-      ],
       leading: IconButton(
         icon: const Icon(Icons.home),
         tooltip: 'Menu Icon',

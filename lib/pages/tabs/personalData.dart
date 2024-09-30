@@ -6,6 +6,7 @@ import 'package:fit_tracker/widgets/features/workout_list_test.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fit_tracker/widgets/global/appbar.dart';
+import 'package:fit_tracker/widgets/global/bottombar.dart';
 
 
 class PersonalDataPage extends StatefulWidget {
@@ -18,23 +19,25 @@ class PersonalDataPage extends StatefulWidget {
 class _PersonalDataPageState extends State<PersonalDataPage> {
   @override
   Widget build(BuildContext context) {
+
+    var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: CustomAppBar(
         titleText: 'Dados Pessoais',
         icon: Icons.account_circle,
         
       ),
-      body: Column(
+      body:Flexible( 
+        child: Column(
         children: <Widget>[
-          Expanded(
-            child: Container(
+             Container(
               color: pLightGray, // Define o fundo branco para `PersonalData`
-              child: Center(
-                child: PersonalData(),
-              ),
-            ),
+                child: PersonalData(), 
           ),
+
+                CustomBottomBar(),
         ],
+      ),
       ),
     );
   }

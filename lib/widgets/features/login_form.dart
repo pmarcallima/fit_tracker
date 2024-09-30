@@ -23,6 +23,7 @@ class _LoginFormState extends State<LoginForm> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height:50),
 
             Text.rich(
               TextSpan(

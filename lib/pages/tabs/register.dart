@@ -1,5 +1,6 @@
 import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:fit_tracker/widgets/features/register_form.dart';
+import 'package:fit_tracker/widgets/global/bottombar.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/widgets/global/appbar.dart';
@@ -31,6 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 RegisterForm(),
+
               ],
             ),
           ),

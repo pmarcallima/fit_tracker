@@ -5,6 +5,7 @@ import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'package:fit_tracker/utils/colors.dart';
 
@@ -25,24 +26,21 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
       children: [ 
 Container(
-width: screenSize.width,
+            width: screenSize.width,
             height: screenSize.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(BACKGROUND), // Path to your image
-                fit: BoxFit.fill, // Adjust to cover the entire screen
-              ),
-            ),
+            child: SvgPicture.asset(
+            BACKGROUND, 
+            fit: BoxFit.cover, 
+          ),
           ),
 
           Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Texto centralizado
               Text.rich(
                 TextSpan(
-                  text: 'Fit Tracker', // texto padrão
+                  text: 'Fit Tracker', 
                   style: GoogleFonts.blackHanSans(
                     fontStyle: FontStyle.italic,
                     fontSize: 40,

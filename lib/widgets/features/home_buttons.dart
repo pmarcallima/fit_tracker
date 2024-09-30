@@ -41,19 +41,6 @@ class HomeButtons extends StatelessWidget {
           ),
           SizedBox(height: 8.0), // Space between buttons
 
-          ElevatedButton(
-            onPressed: () {
-
-              Navigator.pushNamed(context, '/personalData');
-
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: pLightBlack,
-              foregroundColor: pWhite,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            child: Text('Personal Data'),
-          ),
         ],
       ),
     );

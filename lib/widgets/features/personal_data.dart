@@ -57,7 +57,6 @@ class PersonalData extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 100),
 
           // Botão com tamanho ajustado
           Center(
