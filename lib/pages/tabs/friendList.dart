@@ -2,6 +2,7 @@ import 'package:fit_tracker/widgets/features/friend_list.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/widgets/global/appbar.dart';
+import 'package:fit_tracker/widgets/global/bottombar.dart'; // Importa o CustomBottomBar
 
 class FriendsListPageWrapper extends StatefulWidget {
   const FriendsListPageWrapper();
@@ -28,14 +29,10 @@ class _FriendsListPageWrapperState extends State<FriendsListPageWrapper> {
               ),
             ),
           ),
+          // Adiciona o CustomBottomBar na parte inferior da tela
+          CustomBottomBar(),
         ],
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: FriendsListPageWrapper(),
-  ));
 }

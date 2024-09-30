@@ -21,7 +21,7 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
         Navigator.pushNamed(context, '/workouts'); // Navigate to workouts page
         break;
       case 1:
-        Navigator.pushNamed(context, '/friends'); // Navigate to friends page
+        Navigator.pushNamed(context, '/friendList'); // Navigate to friends page
         break;
       case 2:
         Navigator.pushNamed(context, '/personalData'); // Navigate to profile page

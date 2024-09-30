@@ -21,64 +21,6 @@ Stack(
             ),
           ),
         ),
-
-      AppBar(
-
-      toolbarHeight: 120,
-  title: Column(
-        mainAxisSize: MainAxisSize.min, 
-        children: [
-          Icon(
-            icon,
-            size: 40.0, 
-          ),
-          SizedBox(height: 8.0), 
-          Text(
-            titleText,
-            style: const TextStyle(fontSize: 30),
-          ),
-        ],
-      ),
-      foregroundColor: pWhite,
-        titleTextStyle: TextStyle(fontSize: 30),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-      
-      actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.checklist),
-          tooltip: 'Treinos',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/workouts');
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.group),
-          tooltip: 'Amigos',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/friendList');
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.account_circle),
-          tooltip: 'Perfil',
-          onPressed: () {
-
-              Navigator.pushNamed(context, '/personalData');
-          },
-        ),
-      ],
-      leading: IconButton(
-        icon: const Icon(Icons.home),
-        tooltip: 'Menu Icon',
-        onPressed: () {
-
-              Navigator.pushNamed(context, '/home');
-        },
-      ),
-          ),
         ],
     );
 	}
