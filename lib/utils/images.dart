@@ -4,3 +4,4 @@ const String USERICON = 'assets/images/user.png';
 const String EDIT = 'assets/images/edit.png';
 const String BACKGROUND = 'assets/images/background.png';
 const String APPBAR_BACKGROUND = 'assets/images/appbar_background.png';
+const String QRCODE = 'assets/images/qrcode.png';

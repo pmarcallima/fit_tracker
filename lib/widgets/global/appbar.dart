@@ -58,7 +58,7 @@ Stack(
           tooltip: 'Amigos',
           onPressed: () {
 
-              Navigator.pushNamed(context, '/');
+              Navigator.pushNamed(context, '/friendList');
           },
         ),
         IconButton(
