@@ -1,41 +1,85 @@
+import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/utils/colors.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
   final String titleText;
+  final IconData icon;
 
-  const CustomAppBar({Key? key, required this.titleText}) : super(key: key);
+  const CustomAppBar({Key? key, required this.titleText, required this.icon}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(titleText),
+
+    return
+Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(BACKGROUND), 
+              fit: BoxFit.fill, 
+            ),
+          ),
+        ),
+
+      AppBar(
+
+      toolbarHeight: 120,
+  title: Column(
+        mainAxisSize: MainAxisSize.min, 
+        children: [
+          Icon(
+            icon,
+            size: 40.0, 
+          ),
+          SizedBox(height: 8.0), 
+          Text(
+            titleText,
+            style: const TextStyle(fontSize: 30),
+          ),
+        ],
+      ),
       foregroundColor: pWhite,
         titleTextStyle: TextStyle(fontSize: 30),
         centerTitle: true,
-        backgroundColor: pRed,
+        backgroundColor: Colors.transparent,
       
       actions: <Widget>[
         IconButton(
-          icon: const Icon(Icons.comment),
-          tooltip: 'Comment Icon',
+          icon: const Icon(Icons.checklist),
+          tooltip: 'Treinos',
           onPressed: () {
 
-              Navigator.pushNamed(context, '/home');
-
+              Navigator.pushNamed(context, '/workouts');
           },
         ),
         IconButton(
-          icon: const Icon(Icons.settings),
-          tooltip: 'Setting Icon',
-          onPressed: () {},
+          icon: const Icon(Icons.group),
+          tooltip: 'Amigos',
+          onPressed: () {
+
+              Navigator.pushNamed(context, '/');
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.account_circle),
+          tooltip: 'Perfil',
+          onPressed: () {
+
+              Navigator.pushNamed(context, '/personalData');
+          },
         ),
       ],
-      elevation: 50.0,
       leading: IconButton(
-        icon: const Icon(Icons.menu),
+        icon: const Icon(Icons.home),
         tooltip: 'Menu Icon',
-        onPressed: () {},
+        onPressed: () {
+
+              Navigator.pushNamed(context, '/home');
+        },
       ),
+          ),
+        ],
     );
 	}
  @override

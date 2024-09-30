@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: CustomAppBar(
 titleText: 'Login',
+        icon: Icons.login,
       ),
       body: Center(
         child: Form(
