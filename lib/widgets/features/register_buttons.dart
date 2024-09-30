@@ -9,7 +9,7 @@ class RegisterButtons extends StatelessWidget {
     return Container(
       width: screenSize.width/3,
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Adjusts the size of the buttons
+        mainAxisSize: MainAxisSize.min, 
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ElevatedButton(
@@ -22,9 +22,9 @@ class RegisterButtons extends StatelessWidget {
               foregroundColor: pWhite,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            child: Text('Criar a conta'),
+            child: Text('Cadastrar'),
           ),
-          SizedBox(height: 8.0), // Space between buttons
+          SizedBox(height: 8.0), 
         ],
       ),
     );

@@ -11,7 +11,7 @@ class ButtonColumnWidget extends StatelessWidget {
     return Container(
       width: screenSize.width / 3,
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Ajusta o tamanho dos botões
+        mainAxisSize: MainAxisSize.min, 
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ElevatedButton(
@@ -19,39 +19,39 @@ class ButtonColumnWidget extends StatelessWidget {
               Navigator.pushNamed(context, '/workouts');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: pRed, // Cor de fundo do botão
+              backgroundColor: pRed, 
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // Borda arredondada
+                borderRadius: BorderRadius.circular(12.0), 
               ),
-              elevation: 5, // Sombra para destaque
+              elevation: 5, 
             ),
             child: Text(
-              'Fazer login',
+              'Login',
               style: TextStyle(
-                fontSize: 18, // Tamanho da fonte
-                fontWeight: FontWeight.bold, // Negrito
-                color: pLightGray, // Cor do texto
+                fontSize: 18, 
+                fontWeight: FontWeight.bold, 
+                color: pLightGray, 
               ),
             ),
           ),
-          SizedBox(height: 10.0), // Espaço entre os botões
+          SizedBox(height: 10.0), 
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: pLightBlack, // Cor de fundo do botão
+              backgroundColor: pLightBlack, 
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), // Borda arredondada
+                borderRadius: BorderRadius.circular(12.0), 
               ),
-              elevation: 5, // Sombra para destaque
+              elevation: 5, 
             ),
             child: Text(
-              'Criar uma conta',
+              'Cadastrar',
               style: TextStyle(
-                fontSize: 18, // Tamanho da fonte
-                fontWeight: FontWeight.bold, // Negrito
-                color: pLightGray, // Cor do texto
+                fontSize: 18, 
+                fontWeight: FontWeight.bold, 
+                color: pLightGray, 
               ),
             ),
           ),
