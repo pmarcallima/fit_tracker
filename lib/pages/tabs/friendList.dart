@@ -23,14 +23,14 @@ class _FriendsListPageWrapperState extends State<FriendsListPageWrapper> {
         children: <Widget>[
           Expanded(
             child: Container(
-              color: pLightGray,
+              color: pGray,
               child: Center(
                 child: FriendsListPage(),
               ),
             ),
           ),
-          // Adiciona o CustomBottomBar na parte inferior da tela
-          CustomBottomBar(),
+
+       CustomBottomBar(currentIndex: 1), 
         ],
       ),
     );

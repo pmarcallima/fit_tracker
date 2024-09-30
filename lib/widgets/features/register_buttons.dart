@@ -22,18 +22,9 @@ class RegisterButtons extends StatelessWidget {
               foregroundColor: pWhite,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            child: Text('Fazer login'),
+            child: Text('Criar a conta'),
           ),
           SizedBox(height: 8.0), // Space between buttons
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: pLightBlack,
-              foregroundColor: pWhite,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            child: Text('Criar uma conta'),
-          ),
         ],
       ),
     );

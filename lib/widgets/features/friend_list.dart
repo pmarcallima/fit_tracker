@@ -1,6 +1,8 @@
+
 import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Importar o pacote para acessar a câmera
+import 'package:image_picker/image_picker.dart';
+import 'package:fit_tracker/utils/colors.dart';
 
 class FriendsListPage extends StatelessWidget {
   final List<Friend> friends = [
@@ -10,48 +12,63 @@ class FriendsListPage extends StatelessWidget {
     Friend(name: "Felipe", streakDays: 2, hasStreak: false),
   ];
 
-  final ImagePicker _picker = ImagePicker(); // Instância para selecionar imagens
+  final ImagePicker _picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: ListView.builder(
-        itemCount: friends.length,
-        itemBuilder: (context, index) {
-          return FriendTile(friend: friends[index]);
-        },
+      backgroundColor: pLightGray,
+      body: Container(
+        width: screenSize.width,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: friends.length,
+                itemBuilder: (context, index) {
+                  return FriendTile(friend: friends[index]);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showInviteModal(context); // Chama o modal ao clicar no botão +
+          _showInviteModal(context);
         },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.grey,
+        backgroundColor: pRed,
+        foregroundColor: pLightGray,
+        child: Icon(Icons.add, size: 30),
       ),
     );
   }
 
-  // Função para exibir o modal com o código QR e o código de amigo
   void _showInviteModal(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0)),
+            borderRadius: BorderRadius.circular(20.0),
+          ),
           child: Container(
             padding: EdgeInsets.all(16.0),
-            height: 460, // Altura ajustada para incluir o botão
+            height: 460,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center, // Centraliza os itens verticalmente
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Convide seus amigos',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                    color: pDarkerRed,
                   ),
                 ),
                 SizedBox(height: 16),
@@ -60,13 +77,16 @@ class FriendsListPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: pBlack,
                   ),
                 ),
                 SizedBox(height: 8),
                 Container(
                   padding: EdgeInsets.all(8),
-                  color: Colors.grey[200],
+                  decoration: BoxDecoration(
+                    color: pLightGray2,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Text(
                     '#QSDF1',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -78,24 +98,23 @@ class FriendsListPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                    color: pBlack,
                   ),
                 ),
                 SizedBox(height: 16),
                 Image.asset(
-                  QRCODE, // Caminho da imagem do QR Code
+                  QRCODE,
                   width: 150,
                   height: 150,
                 ),
                 SizedBox(height: 16),
-                // Botão para abrir a câmera
                 ElevatedButton.icon(
                   onPressed: () => _openCamera(),
                   icon: Icon(Icons.camera_alt),
                   label: Text('Abrir Câmera'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Cor do botão
-                    foregroundColor: Colors.white, // Cor do ícone e do texto
+                    backgroundColor: pLightRed,
+                    foregroundColor: pWhite,
                   ),
                 ),
               ],
@@ -106,12 +125,10 @@ class FriendsListPage extends StatelessWidget {
     );
   }
 
-  // Função para abrir a câmera
   Future<void> _openCamera() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       print('Imagem capturada: ${photo.path}');
-      // Aqui você pode adicionar lógica adicional para lidar com a imagem capturada.
     } else {
       print('Nenhuma imagem capturada.');
     }
@@ -135,31 +152,43 @@ class FriendTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: pWhite,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getAvatarColor(friend.name),
           child: Text(
-            friend.name[0], // Inicial do nome
-            style: TextStyle(color: Colors.white),
+            friend.name[0],
+            style: TextStyle(color: pWhite),
           ),
         ),
-        title: Text(friend.name),
-        subtitle: Text('${friend.streakDays} dias'),
-        trailing: friend.hasStreak ? Icon(Icons.whatshot, color: Colors.orange) : null,
+        title: Text(
+          friend.name,
+          style: TextStyle(color: pBlack, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${friend.streakDays} dias',
+          style: TextStyle(color: pGray),
+        ),
+        trailing: friend.hasStreak
+            ? Icon(Icons.whatshot, color: pRed)
+            : null,
         onTap: () {
-          Navigator.pushNamed(context, '/personalData', arguments: friend);
-        }, // Adiciona a navegação ao tocar no tile
+          Navigator.pushNamed(context, '/friendData', arguments: friend);
+        },
       ),
     );
   }
 
-  // Função para definir a cor do avatar baseado na primeira letra do nome
   Color _getAvatarColor(String name) {
     switch (name[0].toUpperCase()) {
       case 'P':
-        return Colors.black;
+        return pBlack;
       case 'B':
-        return Colors.red;
+        return pRed;
       case 'G':
         return Colors.green;
       case 'F':
@@ -169,4 +198,3 @@ class FriendTile extends StatelessWidget {
     }
   }
 }
-

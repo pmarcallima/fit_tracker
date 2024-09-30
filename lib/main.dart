@@ -1,4 +1,5 @@
 import 'package:fit_tracker/pages/tabs/friendList.dart';
+import 'package:fit_tracker/pages/tabs/friendProfile.dart';
 import 'package:fit_tracker/pages/tabs/home.dart';
 import 'package:fit_tracker/pages/tabs/login.dart';
 import 'package:fit_tracker/pages/tabs/register.dart';
@@ -7,6 +8,8 @@ import 'package:fit_tracker/pages/tabs/personalData.dart';
 import 'package:fit_tracker/pages/tabs/aboutUs.dart';
 import 'package:fit_tracker/widgets/features/friend_list.dart';
 import 'package:flutter/material.dart';
+
+import 'package:fit_tracker/widgets/features/friend_data.dart';
 import 'pages/tabs/login.dart';
 import 'utils/colors.dart';
 
@@ -29,7 +32,8 @@ class MyApp extends StatelessWidget {
         '/workouts': (BuildContext context) => WorkoutsPage(),
         '/personalData': (BuildContext context) => PersonalDataPage(),
         '/friendList': (BuildContext context) => FriendsListPageWrapper(),
-        '/aboutUs': (BuildContext context) => AboutUsPage()
+        '/aboutUs': (BuildContext context) => AboutUsPage(),
+        '/friendData': (BuildContext context) => FriendDataPage(),
       },
       theme: ThemeData(
 

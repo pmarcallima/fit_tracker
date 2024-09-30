@@ -2,87 +2,124 @@
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/utils/colors.dart';
-import 'package:flutter/material.dart';
-
 
 class PersonalData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
-    return Container(
-      width: screenSize.width / 1.2,
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Ajusta o tamanho da coluna
-        children: [
-          const Card(
-            color: pWhite,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text('NOME'),
-              subtitle: Text('Nome Sobrenome'),
+    return SingleChildScrollView(
+      child: Container(
+        height: screenSize.height - 230,
+        width: screenSize.width / 1.2,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: pLightGray,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
             ),
-          ),
-
-          const Card(
-            color: pWhite,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text('DATA DE NASCIMENTO'),
-              subtitle: Text('DD/MM/YYYY'),
-            ),
-          ),
-
-          const Card(
-            color: pWhite,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text('EMAIL'),
-              subtitle: Text('nome@email.com'),
-            ),
-          ),
-
-          const Card(
-            color: pWhite,
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
-              title: Text('ESTATÍSTICAS DE TREINO'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('%', style: TextStyle(fontSize: 16)),
-                  Text('%', style: TextStyle(fontSize: 16)),
-                  Text('%', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 15),
-
-          // Botão com tamanho ajustado
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/home');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: pLightGray2,
-                minimumSize: const Size(70, 70), // Define o tamanho mínimo do botão
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Define o raio das bordas
+          ],
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildProfileTile('NOME', 'Nome Sobrenome'),
+                    _buildProfileTile('DATA DE NASCIMENTO', 'DD/MM/YYYY'),
+                    _buildProfileTile('EMAIL', 'nome@email.com'),
+                    _buildStatisticsTile(),
+                  ],
                 ),
-                elevation: 8, // Adiciona sombra ao botão, aumentando o valor para mais sombra
-                shadowColor: Colors.black, // Define a cor da sombra (opcional)
-              ),
-              child: Image.asset(
-                EDIT,
-                width: 30, // Ajuste o tamanho da imagem, se necessário
               ),
             ),
+            const SizedBox(height: 30), // Espaço entre o conteúdo e o botão
+            _buildEditButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileTile(String title, String subtitle) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      color: pWhite,
+      child: ListTile(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: pDarkRed,
           ),
-          const SizedBox(height: 30),
-        ],
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: pBlack),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatisticsTile() {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      color: pWhite,
+      child: ListTile(
+        title: Text(
+          'ESTATÍSTICAS DE TREINO',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: pDarkRed,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatText('Estatística 1: 70%', pLightRed),
+            _buildStatText('Estatística 2: 85%', pLightRed),
+            _buildStatText('Estatística 3: 90%', pLightRed),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatText(String text, Color color) {
+    return Text(
+      text,
+      style: TextStyle(fontSize: 16, color: color),
+    );
+  }
+
+  Widget _buildEditButton(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/home');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: pRed,
+          foregroundColor: pLightGray,
+          minimumSize: const Size(60, 60),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 8,
+        ),
+        child: Icon(Icons.edit, size: 30),
       ),
     );
   }

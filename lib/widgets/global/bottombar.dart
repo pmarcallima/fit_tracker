@@ -1,47 +1,33 @@
+
 import 'package:flutter/material.dart';
 
 class CustomBottomBar extends StatefulWidget {
-  const CustomBottomBar({Key? key}) : super(key: key);
+  final int currentIndex; // Índice atual recebido como parâmetro
+
+  const CustomBottomBar({Key? key, required this.currentIndex}) : super(key: key);
 
   @override
   _CustomBottomBarState createState() => _CustomBottomBarState();
 }
 
 class _CustomBottomBarState extends State<CustomBottomBar> {
-  int _currentIndex = 0;
-
   void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    // Navega para a página correspondente ao índice selecionado
-    switch (index) {
-      case 0:
-      // Navega para a página de treinos sem empilhar
-        Navigator.pushReplacementNamed(context, '/workouts');
-        break;
-      case 1:
-      // Navega para a página de amigos sem empilhar
-        Navigator.pushReplacementNamed(context, '/friendList');
-        break;
-      case 2:
-      // Navega para a página de perfil sem empilhar
-        Navigator.pushReplacementNamed(context, '/personalData');
-        break;
-      case 3:
-      // Navega para a página sobre nós sem empilhar
-        Navigator.pushReplacementNamed(context, '/aboutUs');
-        break;
-    }
+    Navigator.pushReplacementNamed(context, index == 0
+        ? '/workouts'
+        : index == 1
+            ? '/friendList'
+            : index == 2
+                ? '/personalData'
+                : '/aboutUs');
   }
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _currentIndex, // Destaque o índice selecionado
-      onTap: _onItemTapped, // Gerencia o toque nos itens de navegação
-      type: BottomNavigationBarType.fixed, // Garante que todos os itens sejam exibidos
-      items: const [
+      currentIndex: widget.currentIndex,
+      onTap: _onItemTapped,
+      type: BottomNavigationBarType.fixed,
+      items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.checklist),
           label: 'Treinos',
@@ -59,8 +45,9 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           label: 'Sobre nós',
         ),
       ],
-      selectedItemColor: Colors.blue, // Cor do item selecionado
-      unselectedItemColor: Colors.grey, // Cor dos itens não selecionados
+      selectedItemColor: Colors.red,
+      unselectedItemColor: Colors.grey,
+      backgroundColor: Colors.white,
     );
   }
 }

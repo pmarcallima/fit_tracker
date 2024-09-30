@@ -23,14 +23,14 @@ Stack(
           ),
         ),
  AppBar(
-          toolbarHeight: 120,
+          toolbarHeight: 100,
           backgroundColor: Colors.transparent, // Torna a AppBar transparente
           title: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
-                size: 40.0,
+                size: 30.0,
               ),
               const SizedBox(height: 8.0),
               Text(
@@ -53,5 +53,5 @@ leading: IconButton(
     );
 	}
  @override
-  Size get preferredSize => const Size.fromHeight(120);
+  Size get preferredSize => const Size.fromHeight(100);
 }

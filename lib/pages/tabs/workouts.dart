@@ -17,19 +17,18 @@ class WorkoutsPage extends StatefulWidget {
 
 class _WorkoutsPageState extends State<WorkoutsPage> {
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: CustomAppBar(titleText: 'Treinos', icon: Icons.checklist),
       body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // Texto centralizado
               SizedBox(height: 30),
 
               WorkoutListT(),
 Expanded(child: Container()),
-CustomBottomBar(),
+
+       CustomBottomBar(currentIndex: 0), 
 
             ],
           ),
