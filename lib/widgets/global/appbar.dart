@@ -17,10 +17,38 @@ Stack(
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage(BACKGROUND), 
-              fit: BoxFit.fill, 
+              fit: BoxFit.fitWidth, 
             ),
+
           ),
         ),
+ AppBar(
+          toolbarHeight: 120,
+          backgroundColor: Colors.transparent, // Torna a AppBar transparente
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 40.0,
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                titleText,
+                style: const TextStyle(fontSize: 30),
+              ),
+            ],
+          ),
+          foregroundColor: pWhite,
+          centerTitle: true,
+leading: IconButton(
+            icon: const Icon(Icons.home),
+            tooltip: 'Home',
+            onPressed: () {
+              Navigator.pushNamed(context, '/home');
+            },
+          ),
+          ),
         ],
     );
 	}

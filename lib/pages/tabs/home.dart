@@ -28,9 +28,9 @@ class _HomePageState extends State<HomePage> {
 Container(
             width: screenSize.width,
             height: screenSize.height,
-            child: SvgPicture.asset(
+            child: Image.asset(
             BACKGROUND, 
-            fit: BoxFit.cover, 
+            fit: BoxFit.fill, 
           ),
           ),
 
