@@ -1,11 +1,15 @@
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fit_tracker/utils/images.dart';
+
+import 'dart:io'; 
 
 class Exercise {
   String title;
+  String? imagePath; 
 
-  Exercise(this.title);
+  Exercise(this.title, {USERICON});
 }
 
 class Workout {
@@ -141,18 +145,26 @@ class _WorkoutListState extends State<WorkoutListT> {
                 height: 300,
                 width: double.maxFinite,
                 child: ListView.builder(
-                  itemCount: workout.exercises.length,
-                  itemBuilder: (context, index) {
-                    final exercise = workout.exercises[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: ListTile(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        title: Text(exercise.title),
-                        onTap: () {
-                          _showEditDialog(exercise, setState);
+  itemCount: workout.exercises.length,
+  itemBuilder: (context, index) {
+    final exercise = workout.exercises[index];
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        leading: exercise.imagePath != null
+            ? Image.file(
+                File(exercise.imagePath!),
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              )
+            : Icon(Icons.image, size: 50), // Placeholder se não houver imagem
+        title: Text(exercise.title),
+        onTap: () {
+          _showEditDialog(exercise, setState);
                         },
                       ),
                     );
