@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class CustomBottomBar extends StatefulWidget {
@@ -15,16 +14,23 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
     setState(() {
       _currentIndex = index;
     });
-    // Navigate to the respective page based on the selected index
+    // Navega para a página correspondente ao índice selecionado
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/workouts'); // Navigate to workouts page
+      // Navega para a página de treinos sem empilhar
+        Navigator.pushReplacementNamed(context, '/workouts');
         break;
       case 1:
-        Navigator.pushNamed(context, '/friendList'); // Navigate to friends page
+      // Navega para a página de amigos sem empilhar
+        Navigator.pushReplacementNamed(context, '/friendList');
         break;
       case 2:
-        Navigator.pushNamed(context, '/personalData'); // Navigate to profile page
+      // Navega para a página de perfil sem empilhar
+        Navigator.pushReplacementNamed(context, '/personalData');
+        break;
+      case 3:
+      // Navega para a página sobre nós sem empilhar
+        Navigator.pushReplacementNamed(context, '/aboutUs');
         break;
     }
   }
@@ -32,8 +38,9 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _currentIndex, // Highlight the selected index
-      onTap: _onItemTapped, // Handle tap on the navigation items
+      currentIndex: _currentIndex, // Destaque o índice selecionado
+      onTap: _onItemTapped, // Gerencia o toque nos itens de navegação
+      type: BottomNavigationBarType.fixed, // Garante que todos os itens sejam exibidos
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.checklist),
@@ -47,7 +54,13 @@ class _CustomBottomBarState extends State<CustomBottomBar> {
           icon: Icon(Icons.account_circle),
           label: 'Perfil',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.info),
+          label: 'Sobre nós',
+        ),
       ],
+      selectedItemColor: Colors.blue, // Cor do item selecionado
+      unselectedItemColor: Colors.grey, // Cor dos itens não selecionados
     );
   }
 }

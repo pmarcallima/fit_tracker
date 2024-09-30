@@ -4,6 +4,7 @@ import 'package:fit_tracker/pages/tabs/login.dart';
 import 'package:fit_tracker/pages/tabs/register.dart';
 import 'package:fit_tracker/pages/tabs/workouts.dart';
 import 'package:fit_tracker/pages/tabs/personalData.dart';
+import 'package:fit_tracker/pages/tabs/aboutUs.dart';
 import 'package:fit_tracker/widgets/features/friend_list.dart';
 import 'package:flutter/material.dart';
 import 'pages/tabs/login.dart';
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget {
         '/register': (BuildContext context) => RegisterPage(),
         '/workouts': (BuildContext context) => WorkoutsPage(),
         '/personalData': (BuildContext context) => PersonalDataPage(),
-        '/friendList': (BuildContext context) => FriendsListPageWrapper()
+        '/friendList': (BuildContext context) => FriendsListPageWrapper(),
+        '/aboutUs': (BuildContext context) => AboutUsPage()
       },
       theme: ThemeData(
 
