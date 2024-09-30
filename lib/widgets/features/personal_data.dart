@@ -58,6 +58,8 @@ class PersonalData extends StatelessWidget {
             ),
           ),
 
+          const SizedBox(height: 15),
+
           // Botão com tamanho ajustado
           Center(
             child: ElevatedButton(
@@ -66,7 +68,7 @@ class PersonalData extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: pLightGray2,
-                minimumSize: const Size(100, 100), // Define o tamanho mínimo do botão
+                minimumSize: const Size(70, 70), // Define o tamanho mínimo do botão
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), // Define o raio das bordas
                 ),

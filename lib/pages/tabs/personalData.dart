@@ -34,7 +34,6 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
               color: pLightGray, // Define o fundo branco para `PersonalData`
                 child: PersonalData(), 
           ),
-
                 CustomBottomBar(),
         ],
       ),
