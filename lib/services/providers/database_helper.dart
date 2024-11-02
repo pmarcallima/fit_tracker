@@ -28,8 +28,8 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'fit_tracker.db');
+    final documentsDirectory = await getDatabasesPath();
+    String path = join(documentsDirectory, 'fit_tracker.db');
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 

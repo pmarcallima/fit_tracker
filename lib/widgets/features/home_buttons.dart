@@ -39,8 +39,6 @@ class HomeButtons extends StatelessWidget {
             ),
             child: Text('Criar uma conta'),
           ),
-          SizedBox(height: 8.0), // Space between buttons
-
         ],
       ),
     );

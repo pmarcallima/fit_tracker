@@ -35,23 +35,25 @@ class ButtonColumnWidget extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10.0), 
+          SizedBox(height: 10.0),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/register');
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: pLightBlack, 
+              backgroundColor: pLightBlack,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0), 
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              elevation: 5, 
+              elevation: 5,
             ),
             child: Text(
               'Cadastrar',
               style: TextStyle(
-                fontSize: 18, 
-                fontWeight: FontWeight.bold, 
-                color: pLightGray, 
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: pLightGray,
               ),
             ),
           ),

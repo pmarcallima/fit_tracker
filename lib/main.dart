@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFFEEE6E7),
         useMaterial3: true,
       ),
-      home: TestPage(),
+      home: HomePage(title: 'Fit Tracker'),
     );
   }
 }
