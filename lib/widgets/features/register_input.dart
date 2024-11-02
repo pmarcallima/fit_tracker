@@ -21,7 +21,7 @@ class _RegisterInputState extends State<RegisterInput> {
               iconColor: Color(0xffEEEEEE),
                 fillColor: pWhite, 
               filled: true,
-              labelText: 'Usuário',
+              labelText: 'Email',
               border: OutlineInputBorder(),
             ),
             validator: (value) {

@@ -86,9 +86,10 @@ class FriendData extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatText('Estatística 1: 70%', pLightRed),
-            _buildStatText('Estatística 2: 85%', pLightRed),
-            _buildStatText('Estatística 3: 90%', pLightRed),
+            _buildStatText('Maior Sequência de treinos: 9', pLightRed),
+            _buildStatText('Treinos concluídos: 19', pLightRed),
+            _buildStatText('Quantidade de fichas: 4', pLightRed),
+            _buildStatText('Número de amigos: 12', pLightRed),
           ],
         ),
       ),

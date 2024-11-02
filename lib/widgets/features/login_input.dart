@@ -23,7 +23,7 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
             decoration: InputDecoration(
               fillColor: pWhite,
               filled: true,
-              labelText: 'Usuário',
+              labelText: 'Email',
               labelStyle: TextStyle(color: pDarkGray), // Cor do texto do rótulo
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12.0),

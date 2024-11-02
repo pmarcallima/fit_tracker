@@ -73,37 +73,41 @@ CustomAppBar(titleText: "Sobre nós", icon: (Icons.info)),
   }
 
   Widget _buildCreatorsCard() {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Criadores',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+    return Container(
+      width: double.infinity, // Ocupar toda a largura disponível
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Criadores',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            ...[
-              '• Fábio Andrade',
-              '• Lucas Barros',
-              '• Pedro Marçal',
-              '• Pedro Ribeiro',
-            ].map(
-              (creator) => Text(
-                creator,
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-            )
-          ],
+              SizedBox(height: 8),
+              ...[
+                '• Fábio Andrade',
+                '• Lucas Alkmim',
+                '• Pedro Marçal',
+                '• Pedro Ribeiro',
+              ].map(
+                    (creator) => Text(
+                  creator,
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

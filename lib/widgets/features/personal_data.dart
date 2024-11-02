@@ -88,9 +88,10 @@ class PersonalData extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatText('Estatística 1: 70%', pLightRed),
-            _buildStatText('Estatística 2: 85%', pLightRed),
-            _buildStatText('Estatística 3: 90%', pLightRed),
+            _buildStatText('Maior Sequência de treinos: 7', pLightRed),
+            _buildStatText('Treinos concluídos: 18', pLightRed),
+            _buildStatText('Quantidade de fichas: 5', pLightRed),
+            _buildStatText('Número de amigos: 4', pLightRed),
           ],
         ),
       ),
