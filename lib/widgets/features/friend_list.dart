@@ -3,16 +3,32 @@ import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fit_tracker/utils/colors.dart';
+import 'database_helper.dart';
 
-class FriendsListPage extends StatelessWidget {
-  final List<Friend> friends = [
-    Friend(name: "Pedro", streakDays: 5, hasStreak: true),
-    Friend(name: "Bruno", streakDays: 0, hasStreak: false),
-    Friend(name: "Gabriel", streakDays: 5, hasStreak: true),
-    Friend(name: "Felipe", streakDays: 2, hasStreak: false),
-  ];
+class FriendsListPage extends StatefulWidget {
+  @override
+  _FriendsListPageState createState() => _FriendsListPageState();
+}
 
+class _FriendsListPageState extends State<FriendsListPage> {
   final ImagePicker _picker = ImagePicker();
+  List<Friend> friends = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFriends();
+  }
+
+  Future<void> _loadFriends() async {
+    final dbHelper = DatabaseHelper.instance;
+    List<Friend> loadedFriends = await dbHelper.getFriends();
+    setState(() {
+      friends = loadedFriends;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,23 +36,25 @@ class FriendsListPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: pLightGray,
-      body: Container(
-        width: screenSize.width,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: friends.length,
-                itemBuilder: (context, index) {
-                  return FriendTile(friend: friends[index]);
-                },
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Container(
+              width: screenSize.width,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: friends.length,
+                      itemBuilder: (context, index) {
+                        return FriendTile(friend: friends[index]);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showInviteModal(context);
@@ -141,6 +159,14 @@ class Friend {
   final bool hasStreak;
 
   Friend({required this.name, required this.streakDays, required this.hasStreak});
+
+  factory Friend.fromMap(Map<String, dynamic> map) {
+    return Friend(
+      name: map['name'],
+      streakDays: map['streakDays'],
+      hasStreak: map['hasStreak'] == 1,
+    );
+  }
 }
 
 class FriendTile extends StatelessWidget {
