@@ -121,6 +121,29 @@ class DatabaseHelper {
     });
   }
 
+  Future<User?> getUserById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isEmpty) {
+      return null;
+    }
+
+    return User(
+      id: maps[0]['id'],
+      email: maps[0]['email'],
+      birthDate: maps[0]['birthDate'],
+      password: maps[0]['password'],
+      firstName: maps[0]['firstName'],
+      lastName: maps[0]['lastName'],
+      profilePicture: maps[0]['profilePicture'],
+    );
+  }
+
   Future<User?> getUserByEmail(String email) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -241,7 +264,7 @@ class DatabaseHelper {
     return await db.insert('friends', friend.toMap());
   }
 
-  Future<List<Friend>> getFriends(User user) async {
+  Future<List<Friends>> getFriendList(User user) async {
   final db = await database;
 
   // Consulta para unir `friends_has_users` com `users` e `statistics`
@@ -255,14 +278,13 @@ class DatabaseHelper {
   ''', [user.id]);
 
   return List.generate(maps.length, (i) {
-    return Friend(
+    return Friends(
       name: maps[i]['name'],
       streakDays: maps[i]['currentStreak'],
       hasStreak: maps[i]['hasStreak'] == 1, // Converte o valor 1 ou 0 para bool
     );
   });
 }
-
 
   Future<int> insertFriendUser(FriendUser friendUser) async {
     final db = await database;

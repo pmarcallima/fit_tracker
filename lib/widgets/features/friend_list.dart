@@ -3,7 +3,8 @@ import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fit_tracker/utils/colors.dart';
-import 'database_helper.dart';
+import 'package:fit_tracker/utils/global_context.dart';
+import 'package:fit_tracker/services/providers/database_helper.dart';
 
 class FriendsListPage extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class FriendsListPage extends StatefulWidget {
 
 class _FriendsListPageState extends State<FriendsListPage> {
   final ImagePicker _picker = ImagePicker();
-  List<Friend> friends = [];
+  List<Friends> friends = [];
   bool isLoading = true;
 
   @override
@@ -23,7 +24,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   Future<void> _loadFriends() async {
     final dbHelper = DatabaseHelper.instance;
-    List<Friend> loadedFriends = await dbHelper.getFriends();
+    List<Friends> loadedFriends = await dbHelper.getFriendList(getUserById(GlobalContext.userId));
     setState(() {
       friends = loadedFriends;
       isLoading = false;
@@ -153,15 +154,15 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 }
 
-class Friend {
+class Friends {
   final String name;
   final int streakDays;
   final bool hasStreak;
 
-  Friend({required this.name, required this.streakDays, required this.hasStreak});
+  Friends({required this.name, required this.streakDays, required this.hasStreak});
 
-  factory Friend.fromMap(Map<String, dynamic> map) {
-    return Friend(
+  factory Friends.fromMap(Map<String, dynamic> map) {
+    return Friends(
       name: map['name'],
       streakDays: map['streakDays'],
       hasStreak: map['hasStreak'] == 1,
@@ -170,7 +171,7 @@ class Friend {
 }
 
 class FriendTile extends StatelessWidget {
-  final Friend friend;
+  final Friends friend;
 
   const FriendTile({Key? key, required this.friend}) : super(key: key);
 
