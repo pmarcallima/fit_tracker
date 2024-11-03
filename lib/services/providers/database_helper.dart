@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart';
@@ -30,6 +29,7 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     final documentsDirectory = await getDatabasesPath();
     String path = join(documentsDirectory, 'fit_tracker.db');
+    print("Database path: $path");
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
@@ -58,15 +58,16 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS exercises (
-        id INTEGER NOT NULL,
-        name TEXT,
-        description TEXT,
-        workoutId INTEGER NOT NULL,
-        PRIMARY KEY (id, workoutId),
-        FOREIGN KEY (workoutId) REFERENCES workouts(id)
-      );
-    ''');
+  CREATE TABLE IF NOT EXISTS exercises (
+    id INTEGER NOT NULL,
+    name TEXT,
+    description TEXT,
+    image BLOB, -- Add this line to define the image column
+    workoutId INTEGER NOT NULL,
+    PRIMARY KEY (id, workoutId),
+    FOREIGN KEY (workoutId) REFERENCES workouts(id)
+  );
+''');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS statistics (
@@ -125,9 +126,86 @@ class DatabaseHelper {
     return await db.insert('workouts', workout.toMap());
   }
 
+  // Método para recuperar todos os treinos de um usuário específico
+  Future<List<Workout>> getAllWorkoutsByUserId(int userId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'workouts',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Workout(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        workoutPicture: maps[i]['workoutPicture'],
+        userId: maps[i]['userId'],
+      );
+    });
+  }
+
+  // Método para recuperar todos os exercícios de um treino específico
+  Future<List<Exercise>> getAllExercisesByWorkoutId(int workoutId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'exercises',
+      where: 'workoutId = ?',
+      whereArgs: [workoutId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return Exercise(
+        id: maps[i]['id'],
+        name: maps[i]['name'],
+        description: maps[i]['description'],
+        workoutId: maps[i]['workoutId'],
+      );
+    });
+  }
+
+  Future<int> deleteWorkout(int workoutId, int userId) async {
+    final db = await database;
+    return await db.delete(
+      'workouts',
+      where: 'id = ? AND userId = ?',
+      whereArgs: [workoutId, userId],
+    );
+  }
+
+  Future<int> updateWorkout(Workout workout) async {
+    final db = await database;
+
+    return await db.update(
+      'workouts',
+      workout.toMap(), // Supondo que exista um método para converter o Workout em um Map
+      where: 'id = ?',
+      whereArgs: [workout.id],
+    );
+  }
+
   Future<int> insertExercise(Exercise exercise) async {
     final db = await database;
     return await db.insert('exercises', exercise.toMap());
+  }
+
+  Future<int> updateExercise(Exercise exercise) async {
+    final db = await database;
+    return await db.update(
+      'exercises',
+      exercise.toMap(), // Converte o exercício atualizado para um mapa
+      where: 'id = ? AND workoutId = ?', // Condição para identificar o exercício
+      whereArgs: [exercise.id, exercise.workoutId], // Argumentos para a condição
+    );
+  }
+
+  Future<int> deleteExercise(int exerciseId, int workoutId) async {
+    final db = await database;
+    return await db.delete(
+      'exercises',
+      where: 'id = ? AND workoutId = ?',
+      whereArgs: [exerciseId, workoutId],
+    );
   }
 
   Future<int> insertStatistic(Statistic statistic) async {

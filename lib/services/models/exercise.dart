@@ -1,14 +1,19 @@
 
+import 'dart:ui';
+import 'dart:typed_data';
+
 class Exercise {
-  final int? id;
-  final String? name;
-  final String? description;
+  final int id;
+  String name;
+  String? description;
   final int workoutId;
+  Uint8List? image;
 
   Exercise({
-    this.id,
-    this.name,
+    required this.id,
+    required this.name,
     this.description,
+    this.image,
     required this.workoutId,
   });
 
@@ -17,6 +22,7 @@ class Exercise {
       'id': id,
       'name': name,
       'description': description,
+      'image': image,
       'workoutId': workoutId,
     };
   }

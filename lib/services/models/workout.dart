@@ -2,13 +2,13 @@
 import 'dart:typed_data';
 
 class Workout {
-  final int? id;
-  final String? name;
+  final int id;
+  String? name;
   final Uint8List? workoutPicture;
   final int userId;
 
   Workout({
-    this.id,
+    required this.id,
     this.name,
     this.workoutPicture,
     required this.userId,
