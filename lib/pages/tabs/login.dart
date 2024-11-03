@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-titleText: 'Login',
+      titleText: 'Login',
         icon: Icons.login,
       ),
       body: Center(
@@ -26,7 +26,6 @@ titleText: 'Login',
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 LoginForm(),
-                
               ],
             ),
         ),

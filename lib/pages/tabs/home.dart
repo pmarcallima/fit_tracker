@@ -1,6 +1,5 @@
 import 'package:fit_tracker/utils/images.dart';
 import 'package:fit_tracker/widgets/features/home_buttons.dart';
-import 'package:fit_tracker/widgets/features/login_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_form.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';

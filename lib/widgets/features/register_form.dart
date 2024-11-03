@@ -1,8 +1,4 @@
-
 import 'package:fit_tracker/utils/colors.dart';
-import 'package:fit_tracker/widgets/features/login_buttons.dart';
-import 'package:fit_tracker/widgets/features/login_input.dart';
-import 'package:fit_tracker/widgets/features/register_buttons.dart';
 import 'package:fit_tracker/widgets/features/register_input.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,8 +9,6 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -41,7 +35,6 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             SizedBox(height: 50),
             RegisterInput(),
-            //RegisterButtons(),
           ],
         ),
       ),

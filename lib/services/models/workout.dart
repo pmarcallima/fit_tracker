@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 class Workout {
   final int? id;
-  final String? name;
+  String? name;
   final Uint8List? workoutPicture;
   final int userId;
 

@@ -66,6 +66,9 @@ class _RegisterInputState extends State<RegisterInput> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuário registrado com sucesso!')),
       );
+
+      Navigator.pushNamed(context, '/home');
+
     }
   }
 
