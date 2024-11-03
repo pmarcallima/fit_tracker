@@ -29,7 +29,6 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 RegisterForm(),
-
               ],
             ),
           ),

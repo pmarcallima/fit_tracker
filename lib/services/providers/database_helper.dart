@@ -121,6 +121,29 @@ class DatabaseHelper {
     });
   }
 
+  Future<User?> getUserByEmail(String email) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'users',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+
+    if (maps.isEmpty) {
+      return null;
+    }
+
+    return User(
+      id: maps[0]['id'],
+      email: maps[0]['email'],
+      birthDate: maps[0]['birthDate'],
+      password: maps[0]['password'],
+      firstName: maps[0]['firstName'],
+      lastName: maps[0]['lastName'],
+      profilePicture: maps[0]['profilePicture'],
+    );
+  }
+
   Future<int> insertWorkout(Workout workout) async {
     final db = await database;
     return await db.insert('workouts', workout.toMap());

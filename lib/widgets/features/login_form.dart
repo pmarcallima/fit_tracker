@@ -1,5 +1,4 @@
 import 'package:fit_tracker/utils/colors.dart';
-import 'package:fit_tracker/widgets/features/login_buttons.dart';
 import 'package:fit_tracker/widgets/features/login_input.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -39,8 +38,6 @@ class _LoginFormState extends State<LoginForm> {
               ),
             SizedBox(height: 120),
             CustomFormWidget(),
-            SizedBox(height: 30),
-            ButtonColumnWidget(),
           ],
         ),
       ),

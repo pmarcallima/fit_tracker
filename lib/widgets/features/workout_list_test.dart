@@ -5,6 +5,8 @@ import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/utils/global_context.dart';
+
 import 'dart:io';
 
 final DatabaseHelper _databaseHelper = DatabaseHelper();
@@ -50,6 +52,7 @@ class _WorkoutListState extends State<WorkoutListT> {
       buttonText = 'Treino confirmado';
     });
     _listUsers();
+    print('connected user id: ${GlobalContext.userId}');
   }
 
   Future<void> _listUsers() async {
@@ -57,7 +60,7 @@ class _WorkoutListState extends State<WorkoutListT> {
     for (var user in _users) {
       int birthDateMilliseconds = user.birthDate ?? 0;
       print(
-          'User: ${user.email}, Name: ${user.firstName} ${user.lastName}, Birth Date: ${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}');
+          'User: ${user.email}, Name: ${user.firstName} ${user.lastName}, id: ${user.id}, Birth Date: ${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}');
     }
   }
 
