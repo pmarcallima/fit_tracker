@@ -35,68 +35,68 @@ class DatabaseHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        email TEXT NOT NULL UNIQUE,
-        birthDate DATE,
-        password TEXT NOT NULL,
-        firstName TEXT,
-        lastName TEXT,
-        profilePicture BLOB
-      );
-    ''');
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      birthDate DATE,
+      password TEXT NOT NULL,
+      firstName TEXT,
+      lastName TEXT,
+      profilePicture BLOB
+    );
+  ''');
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS workouts (
-        id INTEGER NOT NULL,
-        name TEXT,
-        workoutPicture BLOB,
-        userId INTEGER NOT NULL,
-        PRIMARY KEY (id, userId),
-        FOREIGN KEY (userId) REFERENCES users(id)
-      );
-    ''');
+    CREATE TABLE IF NOT EXISTS workouts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Define id as auto-increment
+      name TEXT,
+      workoutPicture BLOB,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users(id)
+    );
+  ''');
 
     await db.execute('''
-  CREATE TABLE IF NOT EXISTS exercises (
-    id INTEGER NOT NULL,
-    name TEXT,
-    description TEXT,
-    image BLOB, -- Add this line to define the image column
-    workoutId INTEGER NOT NULL,
-    PRIMARY KEY (id, workoutId),
-    FOREIGN KEY (workoutId) REFERENCES workouts(id)
-  );
-''');
+    CREATE TABLE IF NOT EXISTS exercises (
+      id INTEGER NOT NULL,
+      name TEXT,
+      description TEXT,
+      image BLOB,
+      workoutId INTEGER NOT NULL,
+      PRIMARY KEY (id, workoutId),
+      FOREIGN KEY (workoutId) REFERENCES workouts(id)
+    );
+  ''');
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS statistics (
-        lastWorkout DATE,
-        totalWorkouts INTEGER,
-        currentStreak INTEGER,
-        biggestStreak INTEGER,
-        totalFriends INTEGER,
-        userId INTEGER PRIMARY KEY,
-        FOREIGN KEY (userId) REFERENCES users(id)
-      );
-    ''');
+    CREATE TABLE IF NOT EXISTS statistics (
+      lastWorkout DATE,
+      totalWorkouts INTEGER,
+      currentStreak INTEGER,
+      biggestStreak INTEGER,
+      totalFriends INTEGER,
+      userId INTEGER PRIMARY KEY,
+      FOREIGN KEY (userId) REFERENCES users(id)
+    );
+  ''');
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS friends (
-        idfriends INTEGER PRIMARY KEY
-      );
-    ''');
+    CREATE TABLE IF NOT EXISTS friends (
+      idfriends INTEGER PRIMARY KEY
+    );
+  ''');
 
     await db.execute('''
-      CREATE TABLE IF NOT EXISTS friends_has_users (
-        friends_idfriends INTEGER NOT NULL,
-        users_id INTEGER NOT NULL,
-        PRIMARY KEY (friends_idfriends, users_id),
-        FOREIGN KEY (friends_idfriends) REFERENCES friends(idfriends),
-        FOREIGN KEY (users_id) REFERENCES users(id)
-      );
-    ''');
+    CREATE TABLE IF NOT EXISTS friends_has_users (
+      friends_idfriends INTEGER NOT NULL,
+      users_id INTEGER NOT NULL,
+      PRIMARY KEY (friends_idfriends, users_id),
+      FOREIGN KEY (friends_idfriends) REFERENCES friends(idfriends),
+      FOREIGN KEY (users_id) REFERENCES users(id)
+    );
+  ''');
   }
+
 
   Future<int> insertUser(User user) async {
     final db = await database;

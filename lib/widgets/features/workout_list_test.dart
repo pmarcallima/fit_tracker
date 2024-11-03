@@ -30,19 +30,18 @@ class _WorkoutListState extends State<WorkoutListT> {
   }
 
   Future<void> _loadWorkouts() async {
-    // Retrieve workouts for userId = 1
-    workouts = await _databaseHelper.getAllWorkoutsByUserId(1);
+    // Retrieve workouts for userId
+    workouts = await _databaseHelper.getAllWorkoutsByUserId(GlobalContext.userId ?? 0);
+    for(var workout in workouts){
+      print(workout.name);
+    }
     setState(() {}); // Refresh the UI once workouts are loaded
   }
 
-  Future<List<Exercise>> _loadExercises(int id) async {
+  Future<List<Exercise>> _loadExercises(int workoutId) async {
     List<Exercise> exercises = [];
 
-    exercises = await _databaseHelper.getAllExercisesByWorkoutId(id);
-
-    for (var exercise in exercises) {
-      print(exercise.name);
-    }
+    exercises = await _databaseHelper.getAllExercisesByWorkoutId(workoutId);
 
     return exercises;
   }
@@ -51,17 +50,7 @@ class _WorkoutListState extends State<WorkoutListT> {
     setState(() {
       buttonText = 'Treino confirmado';
     });
-    _listUsers();
     print('connected user id: ${GlobalContext.userId}');
-  }
-
-  Future<void> _listUsers() async {
-    List<User> _users = await _databaseHelper.getAllUsers();
-    for (var user in _users) {
-      int birthDateMilliseconds = user.birthDate ?? 0;
-      print(
-          'User: ${user.email}, Name: ${user.firstName} ${user.lastName}, id: ${user.id}, Birth Date: ${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}');
-    }
   }
 
   void _monitorWorkoutChanges() {
@@ -86,9 +75,9 @@ class _WorkoutListState extends State<WorkoutListT> {
 
   void _addWorkout() async {
     var novoTreino = Workout(
-        id: workouts.length + 1,
         name: 'Novo Treino ${workouts.length + 1}',
-        userId: 1);
+        userId: GlobalContext.userId ?? 0,
+    );
 
     // Insere o novo treino no banco de dados
     await _databaseHelper.insertWorkout(novoTreino);
@@ -132,17 +121,29 @@ class _WorkoutListState extends State<WorkoutListT> {
 
   void _removeWorkout(int index) async {
     // Obtém o ID do treino e o ID do usuário antes de remover da lista
-    int workoutId = workouts[index].id;
+    int? workoutId = workouts[index].id;  // workoutId is nullable
     int userId = workouts[index].userId;
 
-    // Remove o treino do banco de dados
-    await DatabaseHelper().deleteWorkout(workoutId, userId);
+    // Verifica se workoutId não é nulo antes de deletar
+    if (workoutId != null) {
+      // Remove o treino do banco de dados
+      await DatabaseHelper().deleteWorkout(workoutId, userId);
 
-    // Atualiza o estado e remove o treino da lista local
-    setState(() {
-      workouts.removeAt(index);
-    });
+      // Atualiza o estado e remove o treino da lista local
+      setState(() {
+        workouts.removeAt(index);
+      });
+    } else {
+      print("Erro: ID do treino é nulo e não pode ser removido.");
+    }
   }
+
+  Future<int> _getExerciseCount(int workoutId) async {
+    List<Exercise> exercicios = await _loadExercises(workoutId);
+    return exercicios.length;
+  }
+
+
 
   void _showEditDialog(Exercise exercise, StateSetter updateParentState) {
     var screenSize = MediaQuery.of(context).size;
@@ -273,7 +274,7 @@ class _WorkoutListState extends State<WorkoutListT> {
                 height: 300,
                 width: double.maxFinite,
                 child: FutureBuilder<List<Exercise>>(
-                  future: _loadExercises(workout.id),
+                  future: workout.id != null ? _loadExercises(workout.id!) : Future.value([]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
@@ -419,16 +420,34 @@ class _WorkoutListState extends State<WorkoutListT> {
                     ),
                     child: ListTile(
                       title: Text(
-                        workout.name ??
-                            'Unnamed Workout', // Provide a default value if name is null
+                        workout.name ?? 'Unnamed Workout',
                         style: TextStyle(
                           color: pBlack,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text(
-                        '0 exercícios',
-                        style: TextStyle(color: pGray),
+                      subtitle: FutureBuilder<int>(
+                        future: workout.id != null
+                            ? _getExerciseCount(workout.id!)
+                            : Future.value(0), // Return 0 if workout.id is null
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Text(
+                              'Loading...',
+                              style: TextStyle(color: pGray),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text(
+                              'Error loading exercises',
+                              style: TextStyle(color: pGray),
+                            );
+                          } else {
+                            return Text(
+                              '${snapshot.data} exercícios',
+                              style: TextStyle(color: pGray),
+                            );
+                          }
+                        },
                       ),
                       trailing: IconButton(
                         icon: Icon(Icons.delete, color: pDarkerRed),
