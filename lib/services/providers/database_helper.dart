@@ -431,7 +431,17 @@ Future<List<Friends>> getFriendList(User user) async {
 
   return amigos; // Retorna a lista de amigos
 }
+  Future<int> updateUser(User user) async {
+    final db = await database; // Obtém a instância do banco de dados
 
+    // Atualiza o usuário na tabela
+    return await db.update(
+      'users', // Nome da tabela
+      user.toMap(), // Método para converter o usuário em um mapa
+      where: 'id = ?', // Condição para identificar qual usuário atualizar
+      whereArgs: [user.id], // Argumentos para a condição
+    );
+  }
 
 Future<int> updateStatistics(Statistic statistic) async {
   final db = await database;

@@ -1,11 +1,10 @@
 
 import 'package:fit_tracker/utils/colors.dart';
-import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart'; // Importar seu DatabaseHelper
-import 'package:fit_tracker/services/models/statistics.dart'; // Importar seu modelo Statistic
-import 'package:fit_tracker/services/models/user.dart'; // Importar seu modelo User
-import 'package:fit_tracker/utils/global_context.dart'; // Importar o Provider para acessar o GlobalContext
+import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/services/models/statistics.dart';
+import 'package:fit_tracker/services/models/user.dart';
+import 'package:fit_tracker/utils/global_context.dart';
 
 class PersonalData extends StatelessWidget {
   @override
@@ -17,7 +16,7 @@ class PersonalData extends StatelessWidget {
   }
 
   Widget _buildUserData(int userId, BuildContext context) {
-  final dbHelper = DatabaseHelper();
+    final dbHelper = DatabaseHelper();
     var screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Container(
@@ -39,7 +38,7 @@ class PersonalData extends StatelessWidget {
           children: [
             Expanded(
               child: FutureBuilder<User?>(
-                future: dbHelper.getUserById(userId), // Chamar o método para obter o usuário
+                future: dbHelper.getUserById(userId),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -51,7 +50,7 @@ class PersonalData extends StatelessWidget {
                   final user = userSnapshot.data!;
 
                   return FutureBuilder<Statistic>(
-                    future: dbHelper.getStatisticsByUserId(userId), // Chamar o método para obter as estatísticas
+                    future: dbHelper.getStatisticsByUserId(userId),
                     builder: (context, statsSnapshot) {
                       if (statsSnapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -61,14 +60,12 @@ class PersonalData extends StatelessWidget {
                       }
 
                       final statistics = statsSnapshot.data!;
-
-      int birthDateMilliseconds = user.birthDate ?? 0; // Se for null, assume 0
+                      int birthDateMilliseconds = user.birthDate ?? 0;
 
                       return Column(
-
                         children: [
                           _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
-                          _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]), // Formatação da data
+                          _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]),
                           _buildProfileTile('EMAIL', user.email),
                           _buildStatisticsTile(statistics),
                         ],
@@ -78,8 +75,8 @@ class PersonalData extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 30), // Espaço entre o conteúdo e o botão
-            _buildEditButton(context),
+            const SizedBox(height: 30),
+            _buildEditButton(context, userId),
           ],
         ),
       ),
@@ -131,7 +128,7 @@ class PersonalData extends StatelessWidget {
           children: [
             _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
             _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('Quantidade de fichas: ${statistics.userId}', pLightRed), // Corrija se necessário
+            _buildStatText('Quantidade de fichas: ${statistics.userId}', pLightRed),
             _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
@@ -146,11 +143,11 @@ class PersonalData extends StatelessWidget {
     );
   }
 
-  Widget _buildEditButton(BuildContext context) {
+  Widget _buildEditButton(BuildContext context, int userId) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/home');
+          _showEditDialog(context, userId);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: pRed,
@@ -165,4 +162,92 @@ class PersonalData extends StatelessWidget {
       ),
     );
   }
+
+
+void _showEditDialog(BuildContext context, int userId) {
+  final dbHelper = DatabaseHelper();
+
+  // Controladores de texto para os campos
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController(); // Controlador para a senha
+
+  // Carregar os dados do usuário
+  dbHelper.getUserById(userId).then((user) {
+    firstNameController.text = user?.firstName ?? '';
+    lastNameController.text = user?.lastName ?? '';
+    emailController.text = user?.email ?? '';
+    // A senha não deve ser preenchida para segurança
+  });
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Editar Dados Pessoais'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: firstNameController,
+                decoration: InputDecoration(labelText: 'Nome'),
+              ),
+              TextField(
+                controller: lastNameController,
+                decoration: InputDecoration(labelText: 'Sobrenome'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: passwordController, // Campo de senha
+                decoration: InputDecoration(labelText: 'Senha'),
+                obscureText: true, // Torna o texto da senha oculto
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.cancel, color: pDarkRed), // Ícone de cancelar
+            onPressed: () {
+              Navigator.of(context).pop(); // Fechar o popup
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.check, color: pDarkRed), // Ícone de check
+            onPressed: () async {
+              // Verifica se a senha está vazia
+              if (passwordController.text.isEmpty) {
+                // Exibir um diálogo de erro ou uma mensagem de aviso
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('A senha é obrigatória!'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return; // Não prosseguir se a senha estiver vazia
+              }
+
+              // Atualizar os dados do usuário
+              User updatedUser = User(
+                id: userId,
+                firstName: firstNameController.text,
+                lastName: lastNameController.text,
+                email: emailController.text,
+                password: passwordController.text, // Inclua a senha
+              );
+
+              // Chame a função para atualizar o usuário no banco de dados
+              await dbHelper.updateUser(updatedUser);
+              Navigator.of(context).pop(); // Fechar o popup
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
 }
