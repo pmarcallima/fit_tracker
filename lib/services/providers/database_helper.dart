@@ -241,6 +241,29 @@ class DatabaseHelper {
     return await db.insert('friends', friend.toMap());
   }
 
+  Future<List<Friend>> getFriends(User user) async {
+  final db = await database;
+
+  // Consulta para unir `friends_has_users` com `users` e `statistics`
+  final List<Map<String, dynamic>> maps = await db.rawQuery('''
+    SELECT u.firstName AS name, s.currentStreak, 
+           CASE WHEN s.currentStreak > 0 THEN 1 ELSE 0 END AS hasStreak
+    FROM friends_has_users fhu
+    INNER JOIN users u ON u.id = fhu.users_id
+    INNER JOIN statistics s ON s.userId = u.id
+    WHERE fhu.friends_idfriends = ?
+  ''', [user.id]);
+
+  return List.generate(maps.length, (i) {
+    return Friend(
+      name: maps[i]['name'],
+      streakDays: maps[i]['currentStreak'],
+      hasStreak: maps[i]['hasStreak'] == 1, // Converte o valor 1 ou 0 para bool
+    );
+  });
+}
+
+
   Future<int> insertFriendUser(FriendUser friendUser) async {
     final db = await database;
     return await db.insert('friends_has_users', friendUser.toMap());
