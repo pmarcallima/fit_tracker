@@ -29,6 +29,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
     final dbHelper = DatabaseHelper();
     User? user = await dbHelper.getUserById(GlobalContext.userId!);
     
+    
     if (user != null) {
       List<Friends> loadedFriends = await dbHelper.getFriendList(user);
       setState(() {

@@ -294,6 +294,63 @@ Future<int> insertUser(User user) async {
     final db = await database;
     return await db.insert('friends', friend.toMap());
   }
+
+Future<void> addAllFriendsExceptLoggedUser() async {
+  final db = await database;
+  final loggedUserId = GlobalContext.userId; // Supondo que userId seja um int e não nullable.
+
+  if (loggedUserId != null) {
+    // 1. Buscar todos os usuários do banco de dados
+    final List<Map<String, dynamic>> allUsers = await db.rawQuery('SELECT * FROM users');
+
+    for (var user in allUsers) {
+      int friendUserId = user['id']; // Supondo que 'id' é o campo que identifica o usuário
+
+      // 2. Filtrar o usuário logado
+      if (friendUserId != loggedUserId) {
+        FriendUser friendUser = FriendUser(
+          friendId: friendUserId,
+          userId: loggedUserId,
+        );
+
+        print('User ID: $loggedUserId');
+        print('Friend User ID: $friendUserId');
+
+        // Verificar se o amigo já foi adicionado
+        final existingFriend = await db.rawQuery('''
+          SELECT * FROM friends_has_users
+          WHERE friends_idfriends = ? AND users_id = ?
+        ''', [friendUserId, loggedUserId]);
+
+        // Imprimir o resultado da consulta
+        print('Existing Friend: $existingFriend');
+
+        if (existingFriend.isEmpty) {
+          // Inserindo o relacionamento na tabela `friends_has_users`
+          await insertFriendUser(friendUser);
+          print('Added friend: $friendUserId');
+
+          // Atualizando as estatísticas
+          Statistic s = await getStatisticsByUserId(loggedUserId);
+
+          Statistic updatedStatistic = Statistic(
+            lastWorkout: s.lastWorkout,
+            totalWorkouts: s.totalWorkouts,
+            currentStreak: s.currentStreak,
+            biggestStreak: s.biggestStreak,
+            totalFriends: s.totalFriends + 1, // Incrementa totalFriends
+            userId: s.userId,
+          );
+
+          // Salve as estatísticas atualizadas, se necessário
+          await updateStatistics(updatedStatistic); // Certifique-se de ter essa função implementada
+        }
+      }
+    }
+  } else {
+    print('User not logged in.');
+  }
+}
 Future<void> addFriend(int friendUserId) async {
   final db = await database;
   final loggedUserId = GlobalContext.userId; // Supondo que userId seja um int e não nullable.
@@ -347,26 +404,26 @@ await updateStatistics(updatedStatistic);
   }
 Future<List<Friends>> getFriendList(User user) async {
   final db = await database;
-
-  // Consulta para unir friends_has_users com users e statistics
+  addAllFriendsExceptLoggedUser();
   final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT u.firstName AS name, s.currentStreak, fhu.friends_idfriends,
+    SELECT u.id, u.firstName AS name, s.currentStreak,
            CASE WHEN s.currentStreak > 0 THEN 1 ELSE 0 END AS hasStreak
     FROM friends_has_users fhu
-    INNER JOIN users u ON u.id = fhu.users_id
-    INNER JOIN statistics s ON s.userId = fhu.friends_idfriends 
-WHERE fhu.users_id != ?
+    INNER JOIN users u ON u.id = fhu.friends_idfriends
+    INNER JOIN statistics s ON s.userId = u.id
+    WHERE fhu.users_id = ?
   ''', [user.id]);
 
-List<Friends> amigos = List.generate(maps.length, (i) {
+  List<Friends> amigos = List.generate(maps.length, (i) {
     return Friends(
-      id: maps[i]['friends_idfriends'],
+      id: maps[i]['id'],  // Usando o ID do usuário real
       name: maps[i]['name'],
       streakDays: maps[i]['currentStreak'],
-      hasStreak: maps[i]['hasStreak'] == 1, // Converte o valor 1 ou 0 para bool
+      hasStreak: maps[i]['hasStreak'] == 1,
     );
   });
 
+  // Consulta para unir friends_has_users com users e statistics
   // Imprime os amigos
   for (var friend in amigos) {
     print('ID: ${friend.id}, Nome: ${friend.name}, Streak: ${friend.streakDays}, Tem streak: ${friend.hasStreak}');
@@ -374,7 +431,17 @@ List<Friends> amigos = List.generate(maps.length, (i) {
 
   return amigos; // Retorna a lista de amigos
 }
+  Future<int> updateUser(User user) async {
+    final db = await database; // Obtém a instância do banco de dados
 
+    // Atualiza o usuário na tabela
+    return await db.update(
+      'users', // Nome da tabela
+      user.toMap(), // Método para converter o usuário em um mapa
+      where: 'id = ?', // Condição para identificar qual usuário atualizar
+      whereArgs: [user.id], // Argumentos para a condição
+    );
+  }
 
 Future<int> updateStatistics(Statistic statistic) async {
   final db = await database;
@@ -387,5 +454,6 @@ Future<int> updateStatistics(Statistic statistic) async {
     whereArgs: [statistic.userId],
   );
 }
+
 
 }
