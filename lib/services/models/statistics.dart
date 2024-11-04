@@ -15,6 +15,7 @@ class Statistic {
     required this.userId,
   });
 
+
   factory Statistic.fromMap(Map<String, dynamic> map) {
     return Statistic(
       lastWorkout: map['lastWorkout'] != null

@@ -42,8 +42,8 @@ Stack(
           foregroundColor: pWhite,
           centerTitle: true,
 leading: IconButton(
-            icon: const Icon(Icons.home),
-            tooltip: 'Home',
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: () {
               Navigator.pushNamed(context, '/home');
             },

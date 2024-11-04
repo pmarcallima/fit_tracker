@@ -184,6 +184,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 }
 
+
 class FriendData extends StatelessWidget {
   final int friendId;
 
@@ -199,30 +200,51 @@ class FriendData extends StatelessWidget {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        if (userSnapshot.hasError) {
+        if (userSnapshot.hasError || userSnapshot.data == null) {
           return Center(child: Text('Erro ao carregar dados do usuário'));
         }
 
         final user = userSnapshot.data!;
-        int birthDateMilliseconds = user.birthDate ?? 0; 
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
-              _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]),
-              _buildProfileTile('EMAIL', user.email),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Fechar o popup
-                },
-                child: Text('Fechar'),
+        return FutureBuilder<Statistic?>(
+          future: dbHelper.getStatisticsByUserId(friendId),
+          builder: (context, statsSnapshot) {
+            if (statsSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (statsSnapshot.hasError || statsSnapshot.data == null) {
+              return Center(child: Text('Erro ao carregar estatísticas'));
+            }
+
+            final statistics = statsSnapshot.data!;
+
+            return Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Exibir informações do usuário
+                  _buildProfileTile('Nome', '${user.firstName} ${user.lastName}'),
+                  _buildProfileTile('Data de Nascimento', '${DateTime.fromMillisecondsSinceEpoch(user.birthDate ?? 0)}'.split(' ')[0]),
+                  _buildProfileTile('Email', user.email),
+
+                  // Exibir informações de estatísticas
+                  _buildProfileTile('Total de Treinos', statistics.totalWorkouts.toString()),
+                  _buildProfileTile('Streak Atual', statistics.currentStreak.toString()),
+                  _buildProfileTile('Maior Streak', statistics.biggestStreak.toString()),
+                  _buildProfileTile('Total de Amigos', statistics.totalFriends.toString()),
+
+                  const SizedBox(height: 20),
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.red),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Fecha o popup
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -252,7 +274,6 @@ class FriendData extends StatelessWidget {
     );
   }
 }
-
 class FriendTile extends StatelessWidget {
   final Friends friend;
   final Function() onTap;
