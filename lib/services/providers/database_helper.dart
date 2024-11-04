@@ -350,7 +350,7 @@ Future<List<Friends>> getFriendList(User user) async {
 
   // Consulta para unir friends_has_users com users e statistics
   final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT u.firstName AS name, s.currentStreak, fhu.friends_idfriends as id,
+    SELECT u.firstName AS name, s.currentStreak, fhu.friends_idfriends,
            CASE WHEN s.currentStreak > 0 THEN 1 ELSE 0 END AS hasStreak
     FROM friends_has_users fhu
     INNER JOIN users u ON u.id = fhu.users_id
@@ -358,15 +358,23 @@ Future<List<Friends>> getFriendList(User user) async {
 WHERE fhu.users_id != ?
   ''', [user.id]);
 
-  return List.generate(maps.length, (i) {
+List<Friends> amigos = List.generate(maps.length, (i) {
     return Friends(
-      id: maps[i]['id'],
+      id: maps[i]['friends_idfriends'],
       name: maps[i]['name'],
       streakDays: maps[i]['currentStreak'],
       hasStreak: maps[i]['hasStreak'] == 1, // Converte o valor 1 ou 0 para bool
     );
   });
+
+  // Imprime os amigos
+  for (var friend in amigos) {
+    print('ID: ${friend.id}, Nome: ${friend.name}, Streak: ${friend.streakDays}, Tem streak: ${friend.hasStreak}');
+  }
+
+  return amigos; // Retorna a lista de amigos
 }
+
 
 Future<int> updateStatistics(Statistic statistic) async {
   final db = await database;

@@ -1,12 +1,13 @@
 
 import 'package:fit_tracker/services/models/friends.dart';
+import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/services/providers/database_helper.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/utils/global_context.dart';
-import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:fit_tracker/utils/images.dart';
 
 class FriendsListPage extends StatefulWidget {
   @override
@@ -24,28 +25,24 @@ class _FriendsListPageState extends State<FriendsListPage> {
     _loadFriends();
   }
 
-Future<void> _loadFriends() async {
-  final dbHelper = DatabaseHelper();
-
-  // Tenta carregar o usuário pelo ID no GlobalContext
-  User? user = await dbHelper.getUserById(GlobalContext.userId!);
-  
-  // Verifica se o usuário foi encontrado antes de chamar getFriendList
-  if (user != null) {
-    List<Friends> loadedFriends = await dbHelper.getFriendList(user);
-    setState(() {
-      friends = loadedFriends;
-      isLoading = false;
-    });
-  } else {
-    // Lida com o caso de usuário não encontrado (opcional)
-    print("Usuário não encontrado.");
-    setState(() {
-      friends = []; // Limpa a lista de amigos
-      isLoading = false;
-    });
+  Future<void> _loadFriends() async {
+    final dbHelper = DatabaseHelper();
+    User? user = await dbHelper.getUserById(GlobalContext.userId!);
+    
+    if (user != null) {
+      List<Friends> loadedFriends = await dbHelper.getFriendList(user);
+      setState(() {
+        friends = loadedFriends;
+        isLoading = false;
+      });
+    } else {
+      print("Usuário não encontrado.");
+      setState(() {
+        friends = [];
+        isLoading = false;
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +62,9 @@ Future<void> _loadFriends() async {
                     child: ListView.builder(
                       itemCount: friends.length,
                       itemBuilder: (context, index) {
-                        return FriendTile(friend: friends[index]);
+                        return FriendTile(friend: friends[index], onTap: () {
+                          _showFriendDataPopup(friends[index].id);
+                        });
                       },
                     ),
                   ),
@@ -80,6 +79,20 @@ Future<void> _loadFriends() async {
         foregroundColor: pLightGray,
         child: Icon(Icons.add, size: 30),
       ),
+    );
+  }
+
+  void _showFriendDataPopup(int friendId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: FriendData(friendId: friendId),
+        );
+      },
     );
   }
 
@@ -170,11 +183,80 @@ Future<void> _loadFriends() async {
   }
 }
 
+class FriendData extends StatelessWidget {
+  final int friendId;
+
+  FriendData({required this.friendId});
+
+  @override
+  Widget build(BuildContext context) {
+    final dbHelper = DatabaseHelper();
+
+    return FutureBuilder<User?>(
+      future: dbHelper.getUserById(friendId),
+      builder: (context, userSnapshot) {
+        if (userSnapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (userSnapshot.hasError) {
+          return Center(child: Text('Erro ao carregar dados do usuário'));
+        }
+
+        final user = userSnapshot.data!;
+        int birthDateMilliseconds = user.birthDate ?? 0; 
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
+              _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]),
+              _buildProfileTile('EMAIL', user.email),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fechar o popup
+                },
+                child: Text('Fechar'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileTile(String title, String subtitle) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      color: pWhite,
+      child: ListTile(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: pDarkRed,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: pBlack),
+        ),
+      ),
+    );
+  }
+}
 
 class FriendTile extends StatelessWidget {
   final Friends friend;
+  final Function() onTap;
 
-  const FriendTile({Key? key, required this.friend}) : super(key: key);
+  const FriendTile({Key? key, required this.friend, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -204,10 +286,7 @@ class FriendTile extends StatelessWidget {
         trailing: friend.hasStreak
             ? Icon(Icons.whatshot, color: pRed)
             : null,
-        onTap: () {
-          GlobalContext.friendId = friend.id;
-          Navigator.pushNamed(context, '/friendData', );
-        },
+        onTap: onTap, // Chama a função passada quando clicado
       ),
     );
   }

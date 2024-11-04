@@ -9,7 +9,7 @@ class Friends {
 
   factory Friends.fromMap(Map<String, dynamic> map) {
     return Friends(
-      id: map['id'],
+      id: map['friends_idfriends'],
       name: map['name'],
       streakDays: map['streakDays'],
       hasStreak: map['hasStreak'] == 1,

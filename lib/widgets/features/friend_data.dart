@@ -11,10 +11,11 @@ import 'package:fit_tracker/utils/global_context.dart'; // Importar o Provider p
 class FriendData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final userId = GlobalContext.userId!;
-    print("$userId");
+    final userId = GlobalContext.userId! + 1;
+    var friendId = GlobalContext.friendId!;
+    print("$friendId");
 
-    return _buildUserData(userId, context);
+    return _buildUserData(friendId, context);
   }
 
   Widget _buildUserData(int userId, BuildContext context) {
