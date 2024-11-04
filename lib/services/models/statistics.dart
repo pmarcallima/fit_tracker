@@ -26,4 +26,14 @@ class Statistic {
       'userId': userId,
     };
   }
+ factory Statistic.fromMap(Map<String, dynamic> map) {
+    return Statistic(
+      lastWorkout: DateTime.parse(map['lastWorkout']),
+      totalWorkouts: map['totalWorkouts'],
+      currentStreak: map['currentStreak'],
+      biggestStreak: map['biggestStreak'],
+      totalFriends: map['totalFriends'],
+      userId: map['userId'],
+    );
+  }
 }

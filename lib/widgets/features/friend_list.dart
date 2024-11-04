@@ -1,9 +1,13 @@
 
-import 'package:fit_tracker/utils/images.dart';
+import 'package:fit_tracker/services/models/friends.dart';
+import 'package:fit_tracker/services/models/statistics.dart';
+import 'package:fit_tracker/services/models/user.dart';
+import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/utils/colors.dart';
+import 'package:fit_tracker/utils/global_context.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fit_tracker/utils/colors.dart';
-import 'database_helper.dart';
+import 'package:fit_tracker/utils/images.dart';
 
 class FriendsListPage extends StatefulWidget {
   @override
@@ -12,7 +16,7 @@ class FriendsListPage extends StatefulWidget {
 
 class _FriendsListPageState extends State<FriendsListPage> {
   final ImagePicker _picker = ImagePicker();
-  List<Friend> friends = [];
+  List<Friends> friends = [];
   bool isLoading = true;
 
   @override
@@ -22,12 +26,22 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   Future<void> _loadFriends() async {
-    final dbHelper = DatabaseHelper.instance;
-    List<Friend> loadedFriends = await dbHelper.getFriends();
-    setState(() {
-      friends = loadedFriends;
-      isLoading = false;
-    });
+    final dbHelper = DatabaseHelper();
+    User? user = await dbHelper.getUserById(GlobalContext.userId!);
+    
+    if (user != null) {
+      List<Friends> loadedFriends = await dbHelper.getFriendList(user);
+      setState(() {
+        friends = loadedFriends;
+        isLoading = false;
+      });
+    } else {
+      print("Usuário não encontrado.");
+      setState(() {
+        friends = [];
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -48,7 +62,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     child: ListView.builder(
                       itemCount: friends.length,
                       itemBuilder: (context, index) {
-                        return FriendTile(friend: friends[index]);
+                        return FriendTile(friend: friends[index], onTap: () {
+                          _showFriendDataPopup(friends[index].id);
+                        });
                       },
                     ),
                   ),
@@ -63,6 +79,20 @@ class _FriendsListPageState extends State<FriendsListPage> {
         foregroundColor: pLightGray,
         child: Icon(Icons.add, size: 30),
       ),
+    );
+  }
+
+  void _showFriendDataPopup(int friendId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: FriendData(friendId: friendId),
+        );
+      },
     );
   }
 
@@ -153,26 +183,80 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 }
 
-class Friend {
-  final String name;
-  final int streakDays;
-  final bool hasStreak;
+class FriendData extends StatelessWidget {
+  final int friendId;
 
-  Friend({required this.name, required this.streakDays, required this.hasStreak});
+  FriendData({required this.friendId});
 
-  factory Friend.fromMap(Map<String, dynamic> map) {
-    return Friend(
-      name: map['name'],
-      streakDays: map['streakDays'],
-      hasStreak: map['hasStreak'] == 1,
+  @override
+  Widget build(BuildContext context) {
+    final dbHelper = DatabaseHelper();
+
+    return FutureBuilder<User?>(
+      future: dbHelper.getUserById(friendId),
+      builder: (context, userSnapshot) {
+        if (userSnapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (userSnapshot.hasError) {
+          return Center(child: Text('Erro ao carregar dados do usuário'));
+        }
+
+        final user = userSnapshot.data!;
+        int birthDateMilliseconds = user.birthDate ?? 0; 
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
+              _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]),
+              _buildProfileTile('EMAIL', user.email),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Fechar o popup
+                },
+                child: Text('Fechar'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileTile(String title, String subtitle) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 5,
+      color: pWhite,
+      child: ListTile(
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: pDarkRed,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(color: pBlack),
+        ),
+      ),
     );
   }
 }
 
 class FriendTile extends StatelessWidget {
-  final Friend friend;
+  final Friends friend;
+  final Function() onTap;
 
-  const FriendTile({Key? key, required this.friend}) : super(key: key);
+  const FriendTile({Key? key, required this.friend, required this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -202,9 +286,7 @@ class FriendTile extends StatelessWidget {
         trailing: friend.hasStreak
             ? Icon(Icons.whatshot, color: pRed)
             : null,
-        onTap: () {
-          Navigator.pushNamed(context, '/friendData', arguments: friend);
-        },
+        onTap: onTap, // Chama a função passada quando clicado
       ),
     );
   }
