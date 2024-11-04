@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fit_tracker/utils/global_context.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -96,12 +97,26 @@ class DatabaseHelper {
     );
   ''');
   }
+Future<int> insertUser(User user) async {
+  final db = await database;
+  
+  // Inserindo o usuário
+  int userId = await db.insert('users', user.toMap());
 
+  // Criando e inserindo as estatísticas do usuário
+  Statistic statistic = Statistic(
+    lastWorkout: DateTime(1900), // Ou uma data específica se necessário
+    totalWorkouts: 0,
+    currentStreak: 0,
+    biggestStreak: 0,
+    totalFriends: 0,
+    userId: userId, // ID do usuário recém inserido
+  );
 
-  Future<int> insertUser(User user) async {
-    final db = await database;
-    return await db.insert('users', user.toMap());
-  }
+  await insertStatistics(statistic); // Inserindo as estatísticas
+
+  return userId; // Retorne o ID do usuário inserido
+}
 
   // Método para recuperar todos os usuários
   Future<List<User>> getAllUsers() async {
@@ -142,6 +157,22 @@ class DatabaseHelper {
       lastName: maps[0]['lastName'],
       profilePicture: maps[0]['profilePicture'],
     );
+  }
+ Future<Statistic> getStatisticsByUserId(int userId) async {
+    final db = await database; // Obtenha sua instância de banco de dados
+
+    // Consulta as estatísticas com base no ID do usuário
+    final statsMaps = await db.query(
+      'statistics',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+
+    if (statsMaps.isNotEmpty) {
+      return Statistic.fromMap(statsMaps.first);
+    } else {
+      throw Exception('Estatísticas não encontradas para o usuário ID $userId');
+    }
   }
 
   Future<User?> getUserByEmail(String email) async {
@@ -254,7 +285,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> insertStatistic(Statistic statistic) async {
+  Future<int> insertStatistics(Statistic statistic) async {
     final db = await database;
     return await db.insert('statistics', statistic.toMap());
   }
@@ -263,22 +294,73 @@ class DatabaseHelper {
     final db = await database;
     return await db.insert('friends', friend.toMap());
   }
+Future<void> addFriend(int friendUserId) async {
+  final db = await database;
+  final loggedUserId = GlobalContext.userId; // Supondo que userId seja um int e não nullable.
 
-  Future<List<Friends>> getFriendList(User user) async {
+  if (loggedUserId != null) {
+    FriendUser friendUser = FriendUser(
+      friendId: friendUserId,
+      userId: loggedUserId,
+    );
+
+print('User ID: ${loggedUserId}');
+print('User ID: ${friendUserId}');
+    // Verificar se o amigo já foi adicionado
+    final existingFriend = await db.rawQuery('''
+      SELECT * FROM friends_has_users
+      WHERE friends_idfriends = ? AND users_id = ?
+    ''', [friendUserId, loggedUserId]);
+// Imprimir o resultado da consulta
+    print('Existing Friend: $existingFriend');
+
+    if (existingFriend.isEmpty) {
+      // Inserindo o amigo na tabela `friends`
+
+      // Inserindo o relacionamento na tabela `friends_has_users`
+      await insertFriendUser(friendUser);
+      Statistic s = await getStatisticsByUserId(loggedUserId);
+
+Statistic updatedStatistic = Statistic(
+  lastWorkout: s.lastWorkout,
+  totalWorkouts: s.totalWorkouts,
+  currentStreak: s.currentStreak,
+  biggestStreak: s.biggestStreak,
+  totalFriends: s.totalFriends + 1, // Incrementa totalFriends
+  userId: s.userId,
+);
+
+await updateStatistics(updatedStatistic);
+
+    } else {
+      print("Amigo já adicionado.");
+    }
+  } else {
+    print("Erro: ID do usuário logado não encontrado.");
+  }
+}
+
+
+  Future<int> insertFriendUser(FriendUser friendUser) async {
+    final db = await database;
+    return await db.insert('friends_has_users', friendUser.toMap());
+  }
+Future<List<Friends>> getFriendList(User user) async {
   final db = await database;
 
-  // Consulta para unir `friends_has_users` com `users` e `statistics`
+  // Consulta para unir friends_has_users com users e statistics
   final List<Map<String, dynamic>> maps = await db.rawQuery('''
-    SELECT u.firstName AS name, s.currentStreak, 
+    SELECT u.firstName AS name, s.currentStreak, fhu.friends_idfriends as id,
            CASE WHEN s.currentStreak > 0 THEN 1 ELSE 0 END AS hasStreak
     FROM friends_has_users fhu
     INNER JOIN users u ON u.id = fhu.users_id
-    INNER JOIN statistics s ON s.userId = u.id
-    WHERE fhu.friends_idfriends = ?
+    INNER JOIN statistics s ON s.userId = fhu.friends_idfriends 
+WHERE fhu.users_id != ?
   ''', [user.id]);
 
   return List.generate(maps.length, (i) {
     return Friends(
+      id: maps[i]['id'],
       name: maps[i]['name'],
       streakDays: maps[i]['currentStreak'],
       hasStreak: maps[i]['hasStreak'] == 1, // Converte o valor 1 ou 0 para bool
@@ -286,8 +368,16 @@ class DatabaseHelper {
   });
 }
 
-  Future<int> insertFriendUser(FriendUser friendUser) async {
-    final db = await database;
-    return await db.insert('friends_has_users', friendUser.toMap());
-  }
+Future<int> updateStatistics(Statistic statistic) async {
+  final db = await database;
+
+  // Usando o método update para modificar as estatísticas do usuário
+  return await db.update(
+    'statistics',
+    statistic.toMap(),
+    where: 'userId = ?',
+    whereArgs: [statistic.userId],
+  );
+}
+
 }

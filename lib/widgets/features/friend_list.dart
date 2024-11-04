@@ -1,10 +1,12 @@
 
+import 'package:fit_tracker/services/models/friends.dart';
+import 'package:fit_tracker/services/models/user.dart';
+import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/utils/colors.dart';
+import 'package:fit_tracker/utils/global_context.dart';
 import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fit_tracker/utils/colors.dart';
-import 'package:fit_tracker/utils/global_context.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart';
 
 class FriendsListPage extends StatefulWidget {
   @override
@@ -22,14 +24,28 @@ class _FriendsListPageState extends State<FriendsListPage> {
     _loadFriends();
   }
 
-  Future<void> _loadFriends() async {
-    final dbHelper = DatabaseHelper.instance;
-    List<Friends> loadedFriends = await dbHelper.getFriendList(getUserById(GlobalContext.userId));
+Future<void> _loadFriends() async {
+  final dbHelper = DatabaseHelper();
+
+  // Tenta carregar o usuário pelo ID no GlobalContext
+  User? user = await dbHelper.getUserById(GlobalContext.userId!);
+  
+  // Verifica se o usuário foi encontrado antes de chamar getFriendList
+  if (user != null) {
+    List<Friends> loadedFriends = await dbHelper.getFriendList(user);
     setState(() {
       friends = loadedFriends;
       isLoading = false;
     });
+  } else {
+    // Lida com o caso de usuário não encontrado (opcional)
+    print("Usuário não encontrado.");
+    setState(() {
+      friends = []; // Limpa a lista de amigos
+      isLoading = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -154,21 +170,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 }
 
-class Friends {
-  final String name;
-  final int streakDays;
-  final bool hasStreak;
-
-  Friends({required this.name, required this.streakDays, required this.hasStreak});
-
-  factory Friends.fromMap(Map<String, dynamic> map) {
-    return Friends(
-      name: map['name'],
-      streakDays: map['streakDays'],
-      hasStreak: map['hasStreak'] == 1,
-    );
-  }
-}
 
 class FriendTile extends StatelessWidget {
   final Friends friend;
@@ -204,7 +205,8 @@ class FriendTile extends StatelessWidget {
             ? Icon(Icons.whatshot, color: pRed)
             : null,
         onTap: () {
-          Navigator.pushNamed(context, '/friendData', arguments: friend);
+          GlobalContext.friendId = friend.id;
+          Navigator.pushNamed(context, '/friendData', );
         },
       ),
     );

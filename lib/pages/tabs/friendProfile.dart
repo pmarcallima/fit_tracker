@@ -9,6 +9,7 @@ import 'package:fit_tracker/widgets/features/friend_data.dart';
 class FriendDataPage extends StatefulWidget {
   const FriendDataPage();
 
+
   @override
   State<FriendDataPage> createState() => _FriendDataPageState();
 }
