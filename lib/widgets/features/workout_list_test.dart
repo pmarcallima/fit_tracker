@@ -21,36 +21,92 @@ class WorkoutListT extends StatefulWidget {
 class _WorkoutListState extends State<WorkoutListT> {
   String buttonText = 'Confirmar treino';
   List<Workout> workouts = [];
+  DateTime?
+      lastWorkoutDate; // Field to track the last workout confirmation date
+  int totalWorkouts = 0;
+  int biggestStreak = 0;
+  int currentStreak = 0;
 
   @override
   void initState() {
     super.initState();
     _loadWorkouts();
+    _loadUserStatistics();
     _monitorWorkoutChanges();
   }
 
   Future<void> _loadWorkouts() async {
-    // Retrieve workouts for userId
-    workouts = await _databaseHelper.getAllWorkoutsByUserId(GlobalContext.userId ?? 0);
-    for(var workout in workouts){
-      print(workout.name);
-    }
+    workouts =
+        await _databaseHelper.getAllWorkoutsByUserId(GlobalContext.userId ?? 0);
     setState(() {}); // Refresh the UI once workouts are loaded
   }
 
-  Future<List<Exercise>> _loadExercises(int workoutId) async {
-    List<Exercise> exercises = [];
-
-    exercises = await _databaseHelper.getAllExercisesByWorkoutId(workoutId);
-
-    return exercises;
+  Future<void> _loadUserStatistics() async {
+    var stats =
+        await _databaseHelper.getUserStatistics(GlobalContext.userId ?? 0);
+    lastWorkoutDate = stats?.lastWorkout ?? null;
+    totalWorkouts = stats?.totalWorkouts ?? 0;
+    biggestStreak = stats?.biggestStreak ?? 0;
+    currentStreak = stats?.currentStreak ?? 0;
+    setState(() {}); // Update UI with the loaded statistics
   }
 
-  void _onButtonPressed() {
+  void _onButtonPressed() async {
+    DateTime today = DateTime.now();
+
+    // Check if the button was already pressed today
+    if (lastWorkoutDate != null &&
+        lastWorkoutDate!.day == today.day &&
+        lastWorkoutDate!.month == today.month &&
+        lastWorkoutDate!.year == today.year) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Você já confirmou o treino hoje!")),
+      );
+      return;
+    }
+
+    // Calculate the difference in days from the last workout
+    int daysSinceLastWorkout = lastWorkoutDate != null
+        ? today.difference(lastWorkoutDate!).inDays
+        : 0;
+
+    // Determine if we reset or increment the current streak
+    if (daysSinceLastWorkout == 1) {
+      // Increment streak if last workout was yesterday
+      currentStreak++;
+    } else if (daysSinceLastWorkout > 1) {
+      // Reset streak if more than one day has passed
+      currentStreak = 1;
+    }
+
+    totalWorkouts++;
+
+    // Update the biggest streak if the current streak exceeds it
+    if (currentStreak > biggestStreak) {
+      biggestStreak = currentStreak;
+    }
+
+    // Update the button text and record the workout date
     setState(() {
       buttonText = 'Treino confirmado';
+      lastWorkoutDate = today;
     });
-    print('connected user id: ${GlobalContext.userId}');
+
+    // Update statistics in the database
+    await _databaseHelper.updateUserStatistics(
+      GlobalContext.userId ?? 0,
+      lastWorkoutDate: today,
+      totalWorkouts: totalWorkouts,
+      currentStreak: currentStreak,
+      biggestStreak: biggestStreak,
+    );
+
+    print('Connected user id: ${GlobalContext.userId}');
+  }
+
+
+  Future<List<Exercise>> _loadExercises(int workoutId) async {
+    return await _databaseHelper.getAllExercisesByWorkoutId(workoutId);
   }
 
   void _monitorWorkoutChanges() {
@@ -75,8 +131,8 @@ class _WorkoutListState extends State<WorkoutListT> {
 
   void _addWorkout() async {
     var novoTreino = Workout(
-        name: 'Novo Treino ${workouts.length + 1}',
-        userId: GlobalContext.userId ?? 0,
+      name: 'Novo Treino ${workouts.length + 1}',
+      userId: GlobalContext.userId ?? 0,
     );
 
     // Insere o novo treino no banco de dados
@@ -85,7 +141,6 @@ class _WorkoutListState extends State<WorkoutListT> {
     // Recarrega a lista de treinos após a inserção
     await _loadWorkouts();
   }
-
 
   Future<void> _addExercise(workoutId) async {
     var lastId = -1;
@@ -100,28 +155,26 @@ class _WorkoutListState extends State<WorkoutListT> {
     }
 
     var novoExercicio = Exercise(
-        id: lastId + 1,
-        workoutId: workoutId,
-        name: '',
-        description: '');
+        id: lastId + 1, workoutId: workoutId, name: '', description: '');
     _databaseHelper.insertExercise(novoExercicio);
   }
 
   Future<void> _updateExercise(exercise) async {
-    await _databaseHelper.updateExercise(exercise); // Chama o método de atualização do banco
+    await _databaseHelper
+        .updateExercise(exercise); // Chama o método de atualização do banco
     setState(() {}); // Atualiza a interface para refletir a mudança
   }
 
   Future<void> deleteExercise(int exerciseId, int workoutId) async {
-    int idDeletado = await _databaseHelper.deleteExercise(exerciseId, workoutId);
+    int idDeletado =
+        await _databaseHelper.deleteExercise(exerciseId, workoutId);
     setState(() {});
     print('deletado: ${idDeletado}');
   }
 
-
   void _removeWorkout(int index) async {
     // Obtém o ID do treino e o ID do usuário antes de remover da lista
-    int? workoutId = workouts[index].id;  // workoutId is nullable
+    int? workoutId = workouts[index].id; // workoutId is nullable
     int userId = workouts[index].userId;
 
     // Verifica se workoutId não é nulo antes de deletar
@@ -143,12 +196,12 @@ class _WorkoutListState extends State<WorkoutListT> {
     return exercicios.length;
   }
 
-
-
   void _showEditDialog(Exercise exercise, StateSetter updateParentState) {
     var screenSize = MediaQuery.of(context).size;
-    TextEditingController exerciseController = TextEditingController(text: exercise.name);
-    TextEditingController descriptionController = TextEditingController(text: exercise.description);
+    TextEditingController exerciseController =
+        TextEditingController(text: exercise.name);
+    TextEditingController descriptionController =
+        TextEditingController(text: exercise.description);
 
     showModalBottomSheet<void>(
       context: context,
@@ -194,13 +247,13 @@ class _WorkoutListState extends State<WorkoutListT> {
                 width: 100,
                 child: exercise.image != null
                     ? Image.memory(
-                  exercise.image!,
-                  fit: BoxFit.cover,
-                )
+                        exercise.image!,
+                        fit: BoxFit.cover,
+                      )
                     : Container(
-                  color: Colors.grey[300],
-                  child: Icon(Icons.image, size: 50),
-                ),
+                        color: Colors.grey[300],
+                        child: Icon(Icons.image, size: 50),
+                      ),
               ),
               SizedBox(height: 20),
               IconButton(
@@ -208,7 +261,8 @@ class _WorkoutListState extends State<WorkoutListT> {
                 icon: Icon(Icons.file_upload_outlined, color: pDarkRed),
                 onPressed: () async {
                   await _pickImage(exercise);
-                  updateParentState(() {}); // Atualiza o estado do parent para refletir a nova imagem
+                  updateParentState(
+                      () {}); // Atualiza o estado do parent para refletir a nova imagem
                 },
               ),
               SizedBox(height: 20),
@@ -225,10 +279,13 @@ class _WorkoutListState extends State<WorkoutListT> {
                     ),
                     IconButton(
                       onPressed: () async {
-                        exercise.name = exerciseController.text; // Atualiza o nome do exercício
+                        exercise.name = exerciseController
+                            .text; // Atualiza o nome do exercício
                         exercise.description = descriptionController.text;
-                        await _updateExercise(exercise); // Salva as mudanças no banco de dados
-                        updateParentState(() {}); // Atualiza a interface principal
+                        await _updateExercise(
+                            exercise); // Salva as mudanças no banco de dados
+                        updateParentState(
+                            () {}); // Atualiza a interface principal
                         Navigator.of(context).pop();
                       },
                       color: Colors.green,
@@ -238,8 +295,10 @@ class _WorkoutListState extends State<WorkoutListT> {
                       icon: Icon(Icons.delete, color: pDarkerRed),
                       onPressed: () async {
                         await deleteExercise(exercise.id, exercise.workoutId);
-                        setState(() {}); // Atualiza a lista de exercícios na interface
-                        updateParentState(() {}); // Atualiza o estado do diálogo
+                        setState(
+                            () {}); // Atualiza a lista de exercícios na interface
+                        updateParentState(
+                            () {}); // Atualiza o estado do diálogo
                         Navigator.of(context).pop();
                       },
                     ),
@@ -274,7 +333,9 @@ class _WorkoutListState extends State<WorkoutListT> {
                 height: 300,
                 width: double.maxFinite,
                 child: FutureBuilder<List<Exercise>>(
-                  future: workout.id != null ? _loadExercises(workout.id!) : Future.value([]),
+                  future: workout.id != null
+                      ? _loadExercises(workout.id!)
+                      : Future.value([]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
@@ -296,7 +357,9 @@ class _WorkoutListState extends State<WorkoutListT> {
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               tileColor: pLightGray,
-                              title: Text(exercise.name == '' ? 'Adicione um nome' : exercise.name),
+                              title: Text(exercise.name == ''
+                                  ? 'Adicione um nome'
+                                  : exercise.name),
                               leading: exercise.image != null
                                   ? CircleAvatar(
                                       backgroundImage: exercise.image != null
@@ -431,7 +494,8 @@ class _WorkoutListState extends State<WorkoutListT> {
                             ? _getExerciseCount(workout.id!)
                             : Future.value(0), // Return 0 if workout.id is null
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return Text(
                               'Loading...',
                               style: TextStyle(color: pGray),

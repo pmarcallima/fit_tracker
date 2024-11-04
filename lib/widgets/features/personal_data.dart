@@ -5,6 +5,7 @@ import 'package:fit_tracker/services/providers/database_helper.dart';
 import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/utils/global_context.dart';
+import 'package:intl/intl.dart';
 
 class PersonalData extends StatelessWidget {
   @override
@@ -128,12 +129,21 @@ class PersonalData extends StatelessWidget {
           children: [
             _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
             _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('Quantidade de fichas: ${statistics.userId}', pLightRed),
+            _buildStatText('Último treino: ${_formatLastWorkout(statistics.lastWorkout)}', pLightRed), // Formatação
             _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
       ),
     );
+  }
+
+  String _formatLastWorkout(DateTime? lastWorkout) {
+    if (lastWorkout == null) {
+      return 'Nenhum treino registrado'; // Retorna uma mensagem caso não haja último treino
+    }
+
+    // Formatação da data para o formato desejado (ex: 'dd/MM/yyyy')
+    return DateFormat('dd/MM/yyyy').format(lastWorkout);
   }
 
   Widget _buildStatText(String text, Color color) {
