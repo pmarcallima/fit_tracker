@@ -1,3 +1,5 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Statistic {
   DateTime? lastWorkout;
   int totalWorkouts;
@@ -26,6 +28,19 @@ class Statistic {
       biggestStreak: map['biggestStreak'] ?? 0,
       totalFriends: map['totalFriends'] ?? 0,
       userId: map['userId'],
+    );
+  } 
+  factory Statistic.fromFirestore(Map<String, dynamic> firestoreData) {
+
+    return Statistic(
+      lastWorkout: firestoreData['lastWorkout'] != null
+          ? (firestoreData['lastWorkout'] as Timestamp).toDate()
+          : null, // Convertendo Timestamp para DateTime
+      totalWorkouts: firestoreData['totalWorkouts'] ?? 0,
+      currentStreak: firestoreData['currentStreak'] ?? 0,
+      biggestStreak: firestoreData['biggestStreak'] ?? 0,
+      totalFriends: firestoreData['totalFriends'] ?? 0,
+      userId: firestoreData['userId'],
     );
   }
 

@@ -1,6 +1,7 @@
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart';
 import 'package:fit_tracker/utils/global_context.dart';
 
 class CustomFormWidget extends StatefulWidget {
@@ -12,7 +13,7 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   Future<void> _verifyLogin() async {
     if (_formKey.currentState!.validate()) {
@@ -20,21 +21,31 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
       String password = _passwordController.text.trim();
 
       try {
-        final user = await _databaseHelper.getUserByEmail(email);
+        // Tenta fazer login no Firebase Authentication
+        UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
 
-        if (user == null) {
+        // Caso o login seja bem-sucedido, armazena o ID do usuário
+        User? user = userCredential.user;
+        if (user != null) {
+          GlobalContext.userId = 1;  // Armazena o ID do usuário no contexto global
+
+          // Navega para a tela de workouts
+          Navigator.pushReplacementNamed(context, '/workouts');
+        } else {
+          _showErrorDialog('Erro ao autenticar usuário');
+        }
+      } on FirebaseAuthException catch (e) {
+        // Lida com erros específicos do Firebase Auth
+        if (e.code == 'user-not-found') {
           _showErrorDialog('Usuário não encontrado');
-          return;
-        }
-
-        if (user.password != password) {
+        } else if (e.code == 'wrong-password') {
           _showErrorDialog('Senha incorreta');
-          return;
+        } else {
+          _showErrorDialog('Erro ao fazer login: ${e.message}');
         }
-
-        GlobalContext.userId = user.id;
-
-        Navigator.pushReplacementNamed(context, '/workouts');
       } catch (e) {
         _showErrorDialog('Erro ao fazer login: ${e.toString()}');
       }
