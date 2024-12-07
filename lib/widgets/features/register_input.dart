@@ -1,9 +1,11 @@
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/models/user.dart';
+import 'package:fit_tracker/services/models/user.dart' as model;
 import 'package:fit_tracker/services/providers/database_helper.dart';
 import 'package:intl/intl.dart';
-
+import 'package:fit_tracker/auth/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
 class RegisterInput extends StatefulWidget {
   @override
   _RegisterInputState createState() => _RegisterInputState();
@@ -34,26 +36,41 @@ class _RegisterInputState extends State<RegisterInput> {
       });
     }
   }
-
   Future<void> _addUser() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Por favor, selecione uma data de nascimento')),
-        );
-        return;
-      }
+if (_formKey.currentState!.validate()) {
+  if (_selectedDate == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Por favor, selecione uma data de nascimento')),
+    );
+    return;
+  }
 
-      User user = User(
-        email: _emailController.text,
-        password: _passwordController.text,
-        firstName: _nameController.text,
-        lastName: _surnameController.text,
-        birthDate: _selectedDate!.millisecondsSinceEpoch,
-      );
+  try {
+    // Primeiro, crie o usuário no Firebase Auth
+    final auth.UserCredential userCredential = await auth.FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
 
-      await _databaseHelper.insertUser(user);
+    // Verifique se o usuário foi criado com sucesso
+    if (userCredential.user != null) {
+      // Crie um mapa com os dados do usuário
+      final userData = {
+        'uid': userCredential.user!.uid,
+        'name': _nameController.text,
+        'surname': _surnameController.text,
+        'birthdate': _selectedDate!.millisecondsSinceEpoch,
+        'email': _emailController.text.trim(),
+      };
 
+      // Salve os dados no Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(userData);
+
+      // Limpe os campos
       _nameController.clear();
       _surnameController.clear();
       _birthdateController.clear();
@@ -67,10 +84,35 @@ class _RegisterInputState extends State<RegisterInput> {
         SnackBar(content: Text('Usuário registrado com sucesso!')),
       );
 
+      // Navegue para a próxima tela
       Navigator.pushNamed(context, '/home');
-
     }
+  } on auth.FirebaseAuthException catch (e) {
+    String errorMessage;
+    switch (e.code) {
+      case 'weak-password':
+        errorMessage = 'A senha fornecida é muito fraca.';
+        break;
+      case 'email-already-in-use':
+        errorMessage = 'Este email já está registrado.';
+        break;
+      case 'invalid-email':
+        errorMessage = 'O email fornecido é inválido.';
+        break;
+      default:
+        errorMessage = 'Ocorreu um erro no registro: ${e.message}';
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
+  } catch (e) {
+    print('Erro durante o registro: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao registrar usuário: $e')),
+    );
   }
+}
+}
 
   @override
   Widget build(BuildContext context) {

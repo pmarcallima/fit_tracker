@@ -5,6 +5,7 @@ import 'package:fit_tracker/services/providers/database_helper.dart';
 import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/utils/global_context.dart';
+import 'package:intl/intl.dart';
 
 class PersonalData extends StatelessWidget {
   @override
@@ -62,10 +63,15 @@ class PersonalData extends StatelessWidget {
                       final statistics = statsSnapshot.data!;
                       int birthDateMilliseconds = user.birthDate ?? 0;
 
+                      // Formatar a data de nascimento
+                      String formattedBirthDate = DateFormat('dd/MM/yyyy').format(
+                        DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds),
+                      );
+
                       return Column(
                         children: [
                           _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
-                          _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]),
+                          _buildProfileTile('DATA DE NASCIMENTO', formattedBirthDate),
                           _buildProfileTile('EMAIL', user.email),
                           _buildStatisticsTile(statistics),
                         ],
@@ -128,12 +134,21 @@ class PersonalData extends StatelessWidget {
           children: [
             _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
             _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('Quantidade de fichas: ${statistics.userId}', pLightRed),
+            _buildStatText('Último treino: ${_formatLastWorkout(statistics.lastWorkout)}', pLightRed), // Formatação
             _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
       ),
     );
+  }
+
+  String _formatLastWorkout(DateTime? lastWorkout) {
+    if (lastWorkout == null) {
+      return 'Nenhum treino registrado'; // Retorna uma mensagem caso não haja último treino
+    }
+
+    // Formatação da data para o formato desejado (ex: 'dd/MM/yyyy')
+    return DateFormat('dd/MM/yyyy').format(lastWorkout);
   }
 
   Widget _buildStatText(String text, Color color) {
@@ -163,91 +178,96 @@ class PersonalData extends StatelessWidget {
     );
   }
 
+  void _showEditDialog(BuildContext context, int userId) {
+    final dbHelper = DatabaseHelper();
 
-void _showEditDialog(BuildContext context, int userId) {
-  final dbHelper = DatabaseHelper();
+    // Controladores de texto para os campos
+    final TextEditingController firstNameController = TextEditingController();
+    final TextEditingController lastNameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController(); // Controlador para a senha
 
-  // Controladores de texto para os campos
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController(); // Controlador para a senha
+    // Carregar os dados do usuário
+    dbHelper.getUserById(userId).then((user) {
+      firstNameController.text = user?.firstName ?? '';
+      lastNameController.text = user?.lastName ?? '';
+      emailController.text = user?.email ?? '';
+      // A senha não deve ser preenchida para segurança
+    });
 
-  // Carregar os dados do usuário
-  dbHelper.getUserById(userId).then((user) {
-    firstNameController.text = user?.firstName ?? '';
-    lastNameController.text = user?.lastName ?? '';
-    emailController.text = user?.email ?? '';
-    // A senha não deve ser preenchida para segurança
-  });
-
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Editar Dados Pessoais'),
-        content: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextField(
-                controller: firstNameController,
-                decoration: InputDecoration(labelText: 'Nome'),
-              ),
-              TextField(
-                controller: lastNameController,
-                decoration: InputDecoration(labelText: 'Sobrenome'),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
-              ),
-              TextField(
-                controller: passwordController, // Campo de senha
-                decoration: InputDecoration(labelText: 'Senha'),
-                obscureText: true, // Torna o texto da senha oculto
-              ),
-            ],
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Editar Dados Pessoais'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: firstNameController,
+                  decoration: InputDecoration(labelText: 'Nome'),
+                ),
+                TextField(
+                  controller: lastNameController,
+                  decoration: InputDecoration(labelText: 'Sobrenome'),
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(labelText: 'Email'),
+                ),
+                TextField(
+                  controller: passwordController, // Campo de senha
+                  decoration: InputDecoration(labelText: 'Senha'),
+                  obscureText: true, // Torna o texto da senha oculto
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.cancel, color: pDarkRed), // Ícone de cancelar
-            onPressed: () {
-              Navigator.of(context).pop(); // Fechar o popup
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.check, color: pDarkRed), // Ícone de check
-            onPressed: () async {
-              // Verifica se a senha está vazia
-              if (passwordController.text.isEmpty) {
-                // Exibir um diálogo de erro ou uma mensagem de aviso
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('A senha é obrigatória!'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return; // Não prosseguir se a senha estiver vazia
-              }
+          actions: [
+            // Usando Row para alinhar os botões com espaço entre eles
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.cancel, color: pDarkRed), // Ícone de cancelar
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Fechar o popup
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.check, color: pDarkRed), // Ícone de check
+                  onPressed: () async {
+                    // Verifica se a senha está vazia
+                    if (passwordController.text.isEmpty) {
+                      // Exibir um diálogo de erro ou uma mensagem de aviso
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('A senha é obrigatória!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return; // Não prosseguir se a senha estiver vazia
+                    }
 
-              // Atualizar os dados do usuário
-              User updatedUser = User(
-                id: userId,
-                firstName: firstNameController.text,
-                lastName: lastNameController.text,
-                email: emailController.text,
-                password: passwordController.text, // Inclua a senha
-              );
+                    // Atualizar os dados do usuário
+                    User updatedUser = User(
+                      id: userId,
+                      firstName: firstNameController.text,
+                      lastName: lastNameController.text,
+                      email: emailController.text,
+                      password: passwordController.text, // Inclua a senha
+                    );
 
-              // Chame a função para atualizar o usuário no banco de dados
-              await dbHelper.updateUser(updatedUser);
-              Navigator.of(context).pop(); // Fechar o popup
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+                    // Chame a função para atualizar o usuário no banco de dados
+                    await dbHelper.updateUser(updatedUser);
+                    Navigator.of(context).pop(); // Fechar o popup
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

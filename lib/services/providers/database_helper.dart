@@ -70,16 +70,16 @@ class DatabaseHelper {
   ''');
 
     await db.execute('''
-    CREATE TABLE IF NOT EXISTS statistics (
-      lastWorkout DATE,
-      totalWorkouts INTEGER,
-      currentStreak INTEGER,
-      biggestStreak INTEGER,
-      totalFriends INTEGER,
-      userId INTEGER PRIMARY KEY,
-      FOREIGN KEY (userId) REFERENCES users(id)
-    );
-  ''');
+  CREATE TABLE IF NOT EXISTS statistics (
+    lastWorkout TEXT,
+    totalWorkouts INTEGER,
+    currentStreak INTEGER,
+    biggestStreak INTEGER,
+    totalFriends INTEGER,
+    userId INTEGER PRIMARY KEY,
+    FOREIGN KEY (userId) REFERENCES users(id)
+  );
+''');
 
     await db.execute('''
     CREATE TABLE IF NOT EXISTS friends (
@@ -97,26 +97,27 @@ class DatabaseHelper {
     );
   ''');
   }
-Future<int> insertUser(User user) async {
-  final db = await database;
-  
-  // Inserindo o usuário
-  int userId = await db.insert('users', user.toMap());
 
-  // Criando e inserindo as estatísticas do usuário
-  Statistic statistic = Statistic(
-    lastWorkout: DateTime(1900), // Ou uma data específica se necessário
-    totalWorkouts: 0,
-    currentStreak: 0,
-    biggestStreak: 0,
-    totalFriends: 0,
-    userId: userId, // ID do usuário recém inserido
-  );
+  Future<int> insertUser(User user) async {
+    final db = await database;
 
-  await insertStatistics(statistic); // Inserindo as estatísticas
+    // Inserindo o usuário
+    int userId = await db.insert('users', user.toMap());
 
-  return userId; // Retorne o ID do usuário inserido
-}
+    // Criando e inserindo as estatísticas do usuário
+    Statistic statistic = Statistic(
+      lastWorkout: DateTime(1900), // Ou uma data específica se necessário
+      totalWorkouts: 0,
+      currentStreak: 0,
+      biggestStreak: 0,
+      totalFriends: 0,
+      userId: userId, // ID do usuário recém inserido
+    );
+
+    await insertStatistics(statistic); // Inserindo as estatísticas
+
+    return userId; // Retorne o ID do usuário inserido
+  }
 
   // Método para recuperar todos os usuários
   Future<List<User>> getAllUsers() async {
@@ -158,7 +159,8 @@ Future<int> insertUser(User user) async {
       profilePicture: maps[0]['profilePicture'],
     );
   }
- Future<Statistic> getStatisticsByUserId(int userId) async {
+
+  Future<Statistic> getStatisticsByUserId(int userId) async {
     final db = await database; // Obtenha sua instância de banco de dados
 
     // Consulta as estatísticas com base no ID do usuário
@@ -255,7 +257,8 @@ Future<int> insertUser(User user) async {
 
     return await db.update(
       'workouts',
-      workout.toMap(), // Supondo que exista um método para converter o Workout em um Map
+      workout
+          .toMap(), // Supondo que exista um método para converter o Workout em um Map
       where: 'id = ?',
       whereArgs: [workout.id],
     );
@@ -271,8 +274,82 @@ Future<int> insertUser(User user) async {
     return await db.update(
       'exercises',
       exercise.toMap(), // Converte o exercício atualizado para um mapa
-      where: 'id = ? AND workoutId = ?', // Condição para identificar o exercício
-      whereArgs: [exercise.id, exercise.workoutId], // Argumentos para a condição
+      where:
+          'id = ? AND workoutId = ?', // Condição para identificar o exercício
+      whereArgs: [
+        exercise.id,
+        exercise.workoutId
+      ], // Argumentos para a condição
+    );
+  }
+
+  Future<Statistic?> getUserStatistics(int userId) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query(
+      'statistics',
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
+
+    if (maps.isEmpty) {
+      print(userId);
+      print('null');
+      return null;
+    }
+
+    // Converte 'lastWorkout' de String para DateTime
+    return Statistic(
+      lastWorkout: maps[0]['lastWorkout'] != null
+          ? DateTime.parse(maps[0]['lastWorkout'])
+          : null,
+      totalWorkouts: maps[0]['totalWorkouts'],
+      currentStreak: maps[0]['currentStreak'],
+      biggestStreak: maps[0]['biggestStreak'],
+      totalFriends: maps[0]['totalFriends'],
+      userId: maps[0]['userId'],
+    );
+  }
+
+  // Método para atualizar as estatísticas de um usuário
+  Future<int> updateUserStatistics(int userId,
+      {DateTime? lastWorkoutDate,
+      int? totalWorkouts,
+      int? currentStreak,
+      int? biggestStreak,
+      int? totalFriends}) async {
+    // Imprimindo os valores dos parâmetros
+    print('UserId: $userId');
+    print('Last Workout Date: $lastWorkoutDate');
+    print('Total Workouts: $totalWorkouts');
+    print('Current Streak: $currentStreak');
+    print('Biggest Streak: $biggestStreak');
+    print('Total Friends: $totalFriends');
+
+    final db = await database;
+
+    // Criar um mapa para armazenar apenas os campos que precisam ser atualizados
+    Map<String, dynamic> updates = {};
+
+    if (lastWorkoutDate != null)
+      updates['lastWorkout'] = lastWorkoutDate.toIso8601String();
+    if (totalWorkouts != null) updates['totalWorkouts'] = totalWorkouts;
+    if (currentStreak != null) updates['currentStreak'] = currentStreak;
+    if (biggestStreak != null) updates['biggestStreak'] = biggestStreak;
+    if (totalFriends != null) updates['totalFriends'] = totalFriends;
+
+    // Imprimindo o mapa de atualizações antes de executar a operação no banco de dados
+    print('Updates Map: $updates');
+
+    // Verificar se há alguma atualização a ser feita
+    if (updates.isEmpty) return 0;
+
+    // Executar a atualização no banco de dados
+    return await db.update(
+      'statistics',
+      updates,
+      where: 'userId = ?',
+      whereArgs: [userId],
     );
   }
 
@@ -295,117 +372,122 @@ Future<int> insertUser(User user) async {
     return await db.insert('friends', friend.toMap());
   }
 
-Future<void> addAllFriendsExceptLoggedUser() async {
-  final db = await database;
-  final loggedUserId = GlobalContext.userId; // Supondo que userId seja um int e não nullable.
+  Future<void> addAllFriendsExceptLoggedUser() async {
+    final db = await database;
+    final loggedUserId =
+        GlobalContext.userId; // Supondo que userId seja um int e não nullable.
 
-  if (loggedUserId != null) {
-    // 1. Buscar todos os usuários do banco de dados
-    final List<Map<String, dynamic>> allUsers = await db.rawQuery('SELECT * FROM users');
+    if (loggedUserId != null) {
+      // 1. Buscar todos os usuários do banco de dados
+      final List<Map<String, dynamic>> allUsers =
+          await db.rawQuery('SELECT * FROM users');
 
-    for (var user in allUsers) {
-      int friendUserId = user['id']; // Supondo que 'id' é o campo que identifica o usuário
+      for (var user in allUsers) {
+        int friendUserId =
+            user['id']; // Supondo que 'id' é o campo que identifica o usuário
 
-      // 2. Filtrar o usuário logado
-      if (friendUserId != loggedUserId) {
-        FriendUser friendUser = FriendUser(
-          friendId: friendUserId,
-          userId: loggedUserId,
-        );
+        // 2. Filtrar o usuário logado
+        if (friendUserId != loggedUserId) {
+          FriendUser friendUser = FriendUser(
+            friendId: friendUserId,
+            userId: loggedUserId,
+          );
 
-        print('User ID: $loggedUserId');
-        print('Friend User ID: $friendUserId');
+          print('User ID: $loggedUserId');
+          print('Friend User ID: $friendUserId');
 
-        // Verificar se o amigo já foi adicionado
-        final existingFriend = await db.rawQuery('''
+          // Verificar se o amigo já foi adicionado
+          final existingFriend = await db.rawQuery('''
           SELECT * FROM friends_has_users
           WHERE friends_idfriends = ? AND users_id = ?
         ''', [friendUserId, loggedUserId]);
 
-        // Imprimir o resultado da consulta
-        print('Existing Friend: $existingFriend');
+          // Imprimir o resultado da consulta
+          print('Existing Friend: $existingFriend');
 
-        if (existingFriend.isEmpty) {
-          // Inserindo o relacionamento na tabela `friends_has_users`
-          await insertFriendUser(friendUser);
-          print('Added friend: $friendUserId');
+          if (existingFriend.isEmpty) {
+            // Inserindo o relacionamento na tabela `friends_has_users`
+            await insertFriendUser(friendUser);
+            print('Added friend: $friendUserId');
 
-          // Atualizando as estatísticas
-          Statistic s = await getStatisticsByUserId(loggedUserId);
+            // Atualizando as estatísticas
+            Statistic s = await getStatisticsByUserId(loggedUserId);
 
-          Statistic updatedStatistic = Statistic(
-            lastWorkout: s.lastWorkout,
-            totalWorkouts: s.totalWorkouts,
-            currentStreak: s.currentStreak,
-            biggestStreak: s.biggestStreak,
-            totalFriends: s.totalFriends + 1, // Incrementa totalFriends
-            userId: s.userId,
-          );
+            Statistic updatedStatistic = Statistic(
+              lastWorkout: s.lastWorkout,
+              totalWorkouts: s.totalWorkouts,
+              currentStreak: s.currentStreak,
+              biggestStreak: s.biggestStreak,
+              totalFriends: s.totalFriends + 1, // Incrementa totalFriends
+              userId: s.userId,
+            );
 
-          // Salve as estatísticas atualizadas, se necessário
-          await updateStatistics(updatedStatistic); // Certifique-se de ter essa função implementada
+            // Salve as estatísticas atualizadas, se necessário
+            await updateStatistics(
+                updatedStatistic); // Certifique-se de ter essa função implementada
+          }
         }
       }
+    } else {
+      print('User not logged in.');
     }
-  } else {
-    print('User not logged in.');
   }
-}
-Future<void> addFriend(int friendUserId) async {
-  final db = await database;
-  final loggedUserId = GlobalContext.userId; // Supondo que userId seja um int e não nullable.
 
-  if (loggedUserId != null) {
-    FriendUser friendUser = FriendUser(
-      friendId: friendUserId,
-      userId: loggedUserId,
-    );
+  Future<void> addFriend(int friendUserId) async {
+    final db = await database;
+    final loggedUserId =
+        GlobalContext.userId; // Supondo que userId seja um int e não nullable.
 
-print('User ID: ${loggedUserId}');
-print('User ID: ${friendUserId}');
-    // Verificar se o amigo já foi adicionado
-    final existingFriend = await db.rawQuery('''
+    if (loggedUserId != null) {
+      FriendUser friendUser = FriendUser(
+        friendId: friendUserId,
+        userId: loggedUserId,
+      );
+
+      print('User ID: ${loggedUserId}');
+      print('User ID: ${friendUserId}');
+      // Verificar se o amigo já foi adicionado
+      final existingFriend = await db.rawQuery('''
       SELECT * FROM friends_has_users
       WHERE friends_idfriends = ? AND users_id = ?
     ''', [friendUserId, loggedUserId]);
 // Imprimir o resultado da consulta
-    print('Existing Friend: $existingFriend');
+      print('Existing Friend: $existingFriend');
 
-    if (existingFriend.isEmpty) {
-      // Inserindo o amigo na tabela `friends`
+      if (existingFriend.isEmpty) {
+        // Inserindo o amigo na tabela `friends`
 
-      // Inserindo o relacionamento na tabela `friends_has_users`
-      await insertFriendUser(friendUser);
-      Statistic s = await getStatisticsByUserId(loggedUserId);
+        // Inserindo o relacionamento na tabela `friends_has_users`
+        await insertFriendUser(friendUser);
+        Statistic s = await getStatisticsByUserId(loggedUserId);
 
-Statistic updatedStatistic = Statistic(
-  lastWorkout: s.lastWorkout,
-  totalWorkouts: s.totalWorkouts,
-  currentStreak: s.currentStreak,
-  biggestStreak: s.biggestStreak,
-  totalFriends: s.totalFriends + 1, // Incrementa totalFriends
-  userId: s.userId,
-);
+        Statistic updatedStatistic = Statistic(
+          lastWorkout: s.lastWorkout,
+          totalWorkouts: s.totalWorkouts,
+          currentStreak: s.currentStreak,
+          biggestStreak: s.biggestStreak,
+          totalFriends: s.totalFriends + 1, // Incrementa totalFriends
+          userId: s.userId,
+        );
 
-await updateStatistics(updatedStatistic);
-
+        await updateStatistics(updatedStatistic);
+      } else {
+        print("Amigo já adicionado.");
+      }
     } else {
-      print("Amigo já adicionado.");
+      print("Erro: ID do usuário logado não encontrado.");
     }
-  } else {
-    print("Erro: ID do usuário logado não encontrado.");
   }
-}
-
 
   Future<int> insertFriendUser(FriendUser friendUser) async {
     final db = await database;
     return await db.insert('friends_has_users', friendUser.toMap());
   }
-Future<List<Friends>> getFriendList(User user) async {
-  final db = await database;
-  addAllFriendsExceptLoggedUser();
-  final List<Map<String, dynamic>> maps = await db.rawQuery('''
+
+  Future<List<Friends>> getFriendList(User user) async {
+    final db = await database;
+    addAllFriendsExceptLoggedUser();
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
     SELECT u.id, u.firstName AS name, s.currentStreak,
            CASE WHEN s.currentStreak > 0 THEN 1 ELSE 0 END AS hasStreak
     FROM friends_has_users fhu
@@ -414,23 +496,25 @@ Future<List<Friends>> getFriendList(User user) async {
     WHERE fhu.users_id = ?
   ''', [user.id]);
 
-  List<Friends> amigos = List.generate(maps.length, (i) {
-    return Friends(
-      id: maps[i]['id'],  // Usando o ID do usuário real
-      name: maps[i]['name'],
-      streakDays: maps[i]['currentStreak'],
-      hasStreak: maps[i]['hasStreak'] == 1,
-    );
-  });
+    List<Friends> amigos = List.generate(maps.length, (i) {
+      return Friends(
+        id: maps[i]['id'], // Usando o ID do usuário real
+        name: maps[i]['name'],
+        streakDays: maps[i]['currentStreak'],
+        hasStreak: maps[i]['hasStreak'] == 1,
+      );
+    });
 
-  // Consulta para unir friends_has_users com users e statistics
-  // Imprime os amigos
-  for (var friend in amigos) {
-    print('ID: ${friend.id}, Nome: ${friend.name}, Streak: ${friend.streakDays}, Tem streak: ${friend.hasStreak}');
+    // Consulta para unir friends_has_users com users e statistics
+    // Imprime os amigos
+    for (var friend in amigos) {
+      print(
+          'ID: ${friend.id}, Nome: ${friend.name}, Streak: ${friend.streakDays}, Tem streak: ${friend.hasStreak}');
+    }
+
+    return amigos; // Retorna a lista de amigos
   }
 
-  return amigos; // Retorna a lista de amigos
-}
   Future<int> updateUser(User user) async {
     final db = await database; // Obtém a instância do banco de dados
 
@@ -443,17 +527,15 @@ Future<List<Friends>> getFriendList(User user) async {
     );
   }
 
-Future<int> updateStatistics(Statistic statistic) async {
-  final db = await database;
+  Future<int> updateStatistics(Statistic statistic) async {
+    final db = await database;
 
-  // Usando o método update para modificar as estatísticas do usuário
-  return await db.update(
-    'statistics',
-    statistic.toMap(),
-    where: 'userId = ?',
-    whereArgs: [statistic.userId],
-  );
-}
-
-
+    // Usando o método update para modificar as estatísticas do usuário
+    return await db.update(
+      'statistics',
+      statistic.toMap(),
+      where: 'userId = ?',
+      whereArgs: [statistic.userId],
+    );
+  }
 }

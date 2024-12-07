@@ -1,3 +1,4 @@
+
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/widgets/features/workout_list.dart';
 import 'package:fit_tracker/widgets/features/workout_list_test.dart';
@@ -13,19 +14,18 @@ class WorkoutsPage extends StatefulWidget {
 }
 
 class _WorkoutsPageState extends State<WorkoutsPage> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(titleText: 'Treinos', icon: Icons.checklist),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 30),
-            WorkoutListT(),
-            Expanded(child: Container()),
-            CustomBottomBar(currentIndex: 0),
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          SizedBox(height: 30),
+          Expanded(
+            child: WorkoutListT(), // O Expanded deve envolver o widget de lista
+          ),
+          CustomBottomBar(currentIndex: 0),
+        ],
       ),
     );
   }
