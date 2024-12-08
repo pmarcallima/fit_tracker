@@ -1,8 +1,7 @@
-
 import 'package:fit_tracker/services/models/friends.dart';
 import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/services/providers/firebase_helper.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/utils/global_context.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +25,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   Future<void> _loadFriends() async {
-    final dbHelper = DatabaseHelper();
+    final dbHelper = FirebaseService();
     User? user = await dbHelper.getUserById(GlobalContext.userId!);
     
     
