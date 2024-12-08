@@ -1,13 +1,15 @@
 
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart';
+import 'package:fit_tracker/services/providers/firebase_helper.dart';
 import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/utils/global_context.dart';
 import 'package:intl/intl.dart';
 
 class PersonalData extends StatelessWidget {
+  final FirebaseService _firebaseService = FirebaseService();
+
   @override
   Widget build(BuildContext context) {
     final userId = GlobalContext.userId!;
@@ -17,7 +19,6 @@ class PersonalData extends StatelessWidget {
   }
 
   Widget _buildUserData(String userId, BuildContext context) {
-    final dbHelper = DatabaseHelper();
     var screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Container(
@@ -39,7 +40,7 @@ class PersonalData extends StatelessWidget {
           children: [
             Expanded(
               child: FutureBuilder<User?>(
-                future: dbHelper.getUserById(userId),
+                future: _firebaseService.getUserById(userId),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -49,9 +50,10 @@ class PersonalData extends StatelessWidget {
                   }
 
                   final user = userSnapshot.data!;
+                  print(user.firstName);
 
                   return FutureBuilder<Statistic>(
-                    future: dbHelper.getStatisticsByUserId(userId),
+                    future: _firebaseService.getStatisticsByUserId(userId),
                     builder: (context, statsSnapshot) {
                       if (statsSnapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -61,9 +63,8 @@ class PersonalData extends StatelessWidget {
                       }
 
                       final statistics = statsSnapshot.data!;
-                      int birthDateMilliseconds = user.birthDate ?? 0;
+                      int birthDateMilliseconds = user.birthDate?.millisecondsSinceEpoch ?? 0;
 
-                      // Formatar a data de nascimento
                       String formattedBirthDate = DateFormat('dd/MM/yyyy').format(
                         DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds),
                       );
@@ -134,7 +135,7 @@ class PersonalData extends StatelessWidget {
           children: [
             _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
             _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('Último treino: ${_formatLastWorkout(statistics.lastWorkout)}', pLightRed), // Formatação
+            _buildStatText('Último treino: ${_formatLastWorkout(statistics.lastWorkout)}', pLightRed),
             _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
@@ -144,10 +145,8 @@ class PersonalData extends StatelessWidget {
 
   String _formatLastWorkout(DateTime? lastWorkout) {
     if (lastWorkout == null) {
-      return 'Nenhum treino registrado'; // Retorna uma mensagem caso não haja último treino
+      return 'Nenhum treino registrado';
     }
-
-    // Formatação da data para o formato desejado (ex: 'dd/MM/yyyy')
     return DateFormat('dd/MM/yyyy').format(lastWorkout);
   }
 
@@ -158,7 +157,7 @@ class PersonalData extends StatelessWidget {
     );
   }
 
-  Widget _buildEditButton(BuildContext context, int userId) {
+  Widget _buildEditButton(BuildContext context, String userId) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
@@ -178,21 +177,16 @@ class PersonalData extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(BuildContext context, int userId) {
-    final dbHelper = DatabaseHelper();
-
-    // Controladores de texto para os campos
+  void _showEditDialog(BuildContext context, String userId) {
     final TextEditingController firstNameController = TextEditingController();
     final TextEditingController lastNameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController(); // Controlador para a senha
+    final TextEditingController passwordController = TextEditingController();
 
-    // Carregar os dados do usuário
-    dbHelper.getUserById(userId).then((user) {
+    _firebaseService.getUserById(userId).then((user) {
       firstNameController.text = user?.firstName ?? '';
       lastNameController.text = user?.lastName ?? '';
       emailController.text = user?.email ?? '';
-      // A senha não deve ser preenchida para segurança
     });
 
     showDialog(
@@ -203,67 +197,37 @@ class PersonalData extends StatelessWidget {
           content: SingleChildScrollView(
             child: Column(
               children: [
-                TextField(
-                  controller: firstNameController,
-                  decoration: InputDecoration(labelText: 'Nome'),
-                ),
-                TextField(
-                  controller: lastNameController,
-                  decoration: InputDecoration(labelText: 'Sobrenome'),
-                ),
-                TextField(
-                  controller: emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                ),
-                TextField(
-                  controller: passwordController, // Campo de senha
-                  decoration: InputDecoration(labelText: 'Senha'),
-                  obscureText: true, // Torna o texto da senha oculto
-                ),
+                TextField(controller: firstNameController, decoration: InputDecoration(labelText: 'Nome')),
+                TextField(controller: lastNameController, decoration: InputDecoration(labelText: 'Sobrenome')),
+                TextField(controller: emailController, decoration: InputDecoration(labelText: 'Email')),
+                TextField(controller: passwordController, decoration: InputDecoration(labelText: 'Senha'), obscureText: true),
               ],
             ),
           ),
           actions: [
-            // Usando Row para alinhar os botões com espaço entre eles
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.cancel, color: pDarkRed), // Ícone de cancelar
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Fechar o popup
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.check, color: pDarkRed), // Ícone de check
-                  onPressed: () async {
-                    // Verifica se a senha está vazia
-                    if (passwordController.text.isEmpty) {
-                      // Exibir um diálogo de erro ou uma mensagem de aviso
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('A senha é obrigatória!'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return; // Não prosseguir se a senha estiver vazia
-                    }
+            IconButton(
+              icon: Icon(Icons.cancel, color: pDarkRed),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            IconButton(
+              icon: Icon(Icons.check, color: pDarkRed),
+              onPressed: () async {
+                if (passwordController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('A senha é obrigatória!'), backgroundColor: Colors.red));
+                  return;
+                }
 
-                    // Atualizar os dados do usuário
-                    User updatedUser = User(
-                      id: userId,
-                      firstName: firstNameController.text,
-                      lastName: lastNameController.text,
-                      email: emailController.text,
-                      password: passwordController.text, // Inclua a senha
-                    );
+                User updatedUser = User(
+                  id: userId,
+                  firstName: firstNameController.text,
+                  lastName: lastNameController.text,
+                  email: emailController.text,
+                  password: passwordController.text,
+                );
 
-                    // Chame a função para atualizar o usuário no banco de dados
-                    await dbHelper.updateUser(updatedUser);
-                    Navigator.of(context).pop(); // Fechar o popup
-                  },
-                ),
-              ],
+                await _firebaseService.updateUser(updatedUser);
+                Navigator.of(context).pop();
+              },
             ),
           ],
         );

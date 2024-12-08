@@ -225,17 +225,29 @@ void _showEditDialog(Exercise exercise, StateSetter updateParentState) {
   );
 }
 
+
 void _addWorkout() async {
+  // Consulta para encontrar o maior ID existente
+  var snapshot = await _firestore.collection('workouts').get();
+  int nextId = 1;
+
+  if (snapshot.docs.isNotEmpty) {
+    // Encontra o maior ID existente na coleção
+    nextId = snapshot.docs
+        .map((doc) => int.tryParse(doc.id) ?? 0) // Tenta converter os IDs para inteiros
+        .reduce((curr, next) => curr > next ? curr : next) + 1;
+  }
+
+  // Cria o novo treino com o próximo ID como String
   var novoTreino = Workout(
     name: 'Novo Treino',
-    //userId: GlobalContext.userId!,
-      id: 1,
-    userId: 1,
+    userId: GlobalContext.userId!,
+    id: nextId.toString(),
   );
 
-  await _firestore.collection('workouts').add(novoTreino.toMap());
+  // Adiciona o novo treino ao Firestore
+  await _firestore.collection('workouts').doc(novoTreino.id).set(novoTreino.toMap());
 }
-
 Future<void> _addExercise(String workoutId) async {
   var novoExercicio = Exercise(
     workoutId: workoutId,

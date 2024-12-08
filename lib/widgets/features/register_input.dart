@@ -20,7 +20,6 @@ class _RegisterInputState extends State<RegisterInput> {
   final _passwordController = TextEditingController();
   DateTime? _selectedDate;
 
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(

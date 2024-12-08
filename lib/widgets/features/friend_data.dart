@@ -1,24 +1,24 @@
+
 import 'package:fit_tracker/utils/colors.dart';
-import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/providers/firebase_helper.dart'; // Importar seu DatabaseHelper
-import 'package:fit_tracker/services/models/statistics.dart'; // Importar seu modelo Statistic
-import 'package:fit_tracker/services/models/user.dart'; // Importar seu modelo User
-import 'package:fit_tracker/utils/global_context.dart'; // Importar o Provider para acessar o GlobalContext
+import 'package:fit_tracker/services/providers/firebase_helper.dart';
+import 'package:fit_tracker/services/models/statistics.dart';
+import 'package:fit_tracker/services/models/user.dart';
+import 'package:fit_tracker/utils/global_context.dart';
+import 'package:fit_tracker/widgets/features/friend_data.dart';
 
 class FriendData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final userId = GlobalContext.userId! + 1;
-    var friendId = GlobalContext.friendId!;
-    print("$friendId");
+    final friendId = GlobalContext.friendId!; // Obtém o ID do amigo do contexto global
 
     return _buildUserData(friendId, context);
   }
 
-  Widget _buildUserData(int userId, BuildContext context) {
-  final dbHelper = FirebaseService();
-    var screenSize = MediaQuery.of(context).size;
+  Widget _buildUserData(String friendId, BuildContext context) {
+    final dbHelper = FirebaseService();
+    final screenSize = MediaQuery.of(context).size;
+
     return SingleChildScrollView(
       child: Container(
         height: screenSize.height - 230,
@@ -39,7 +39,7 @@ class FriendData extends StatelessWidget {
           children: [
             Expanded(
               child: FutureBuilder<User?>(
-                future: dbHelper.getUserById(userId), // Chamar o método para obter o usuário
+                future: dbHelper.getUserById(friendId),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -47,13 +47,13 @@ class FriendData extends StatelessWidget {
                   if (userSnapshot.hasError) {
                     return Center(child: Text('Erro ao carregar dados do usuário'));
                   }
+                  final user = userSnapshot.data;
+                  if (user == null) {
+                    return Center(child: Text('Usuário não encontrado.'));
+                  }
 
-                  final user = userSnapshot.data!;
-                  print("$userId");
-
-                  return FutureBuilder<Statistic>(
-
-                    future: dbHelper.getStatisticsByUserId(userId), // Chamar o método para obter as estatísticas
+                  return FutureBuilder<Statistic?>(
+                    future: dbHelper.getStatisticsByUserId(friendId),
                     builder: (context, statsSnapshot) {
                       if (statsSnapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -61,16 +61,21 @@ class FriendData extends StatelessWidget {
                       if (statsSnapshot.hasError) {
                         return Center(child: Text('Erro ao carregar estatísticas'));
                       }
+                      final statistics = statsSnapshot.data;
+                      if (statistics == null) {
+                        return Center(child: Text('Estatísticas não disponíveis.'));
+                      }
 
-                      final statistics = statsSnapshot.data!;
-
-      int birthDateMilliseconds = user.birthDate ?? 0; // Se for null, assume 0
+                      DateTime? birthDateMilliseconds = user.birthDate;
 
                       return Column(
-
                         children: [
                           _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
-                          _buildProfileTile('DATA DE NASCIMENTO', '${DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds)}'.split(' ')[0]), // Formatação da data
+
+_buildProfileTile(
+  'DATA DE NASCIMENTO',
+  '${DateTime.fromMillisecondsSinceEpoch((birthDateMilliseconds ?? 0) as int).toLocal()}'.split(' ')[0],
+),
                           _buildProfileTile('EMAIL', user.email),
                           _buildStatisticsTile(statistics),
                         ],
@@ -80,7 +85,7 @@ class FriendData extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 30), // Espaço entre o conteúdo e o botão
+            const SizedBox(height: 30),
             _buildEditButton(context),
           ],
         ),
@@ -106,7 +111,7 @@ class FriendData extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(color: pBlack),
+          style: const TextStyle(color: pBlack),
         ),
       ),
     );
@@ -131,10 +136,10 @@ class FriendData extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
-            _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('Quantidade de fichas: ${statistics.userId}', pLightRed), // Corrija se necessário
-            _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
+            _buildStatText('Maior Sequência de Treinos: ${statistics.biggestStreak}', pLightRed),
+            _buildStatText('Treinos Concluídos: ${statistics.totalWorkouts}', pLightRed),
+            _buildStatText('ID do Usuário: ${statistics.userId}', pLightRed),
+            _buildStatText('Número de Amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
       ),

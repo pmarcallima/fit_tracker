@@ -30,7 +30,7 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
         // Caso o login seja bem-sucedido, armazena o ID do usuário
         User? user = userCredential.user;
         if (user != null) {
-          GlobalContext.userId = 1;  // Armazena o ID do usuário no contexto global
+          GlobalContext.userId = user.uid;  // Armazena o ID do usuário no contexto global
 
           // Navega para a tela de workouts
           Navigator.pushReplacementNamed(context, '/workouts');

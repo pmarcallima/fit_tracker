@@ -9,7 +9,7 @@ class User {
 	String? firstName;
 	String? lastName;
 	String password;
-	int? birthDate;
+	DateTime? birthDate;
 	Uint8List? profilePicture;
 	
 	User({
@@ -29,7 +29,7 @@ class User {
       password: map['password'] as String,
       firstName: map['firstName'] as String?,
       lastName: map['lastName'] as String?,
-      birthDate: map['birthDate'] as int?,
+      birthDate: map['birthDate'] as DateTime?,
       profilePicture: map['profilePicture'] != null 
           ? Uint8List.fromList(List<int>.from(map['profilePicture'])) 
           : null,

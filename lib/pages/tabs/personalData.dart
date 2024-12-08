@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fit_tracker/widgets/global/appbar.dart';
 import 'package:fit_tracker/widgets/global/bottombar.dart';
 
-
 class PersonalDataPage extends StatefulWidget {
   const PersonalDataPage();
 
@@ -16,36 +15,27 @@ class PersonalDataPage extends StatefulWidget {
 class _PersonalDataPageState extends State<PersonalDataPage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: CustomAppBar(
         titleText: 'Dados Pessoais',
         icon: Icons.account_circle,
-        
       ),
-
-      body:
-      Row( 
-      children :[ 
-
-          Flexible( 
-        child: Column(
-            
-        children: <Widget>[
-SizedBox(height:30),
-             Container(
-              color: pLightGray, 
-                child: PersonalData() ,
-          ),
-
+      body: Row(
+        children: [
+          Flexible(
+            child: Column(
+              children: <Widget>[
+                SizedBox(height: 30),
+                Container(
+                  color: pLightGray,
+                  child: PersonalData(),
+                ),
                 Expanded(child: Container()),
-
-          CustomBottomBar(currentIndex: 2),
+                CustomBottomBar(currentIndex: 2),
+              ],
+            ),
+          ),
         ],
-      ),
-      ),
-
-    ],
       ),
     );
   }

@@ -15,7 +15,6 @@ class Workout {
     required this.userId,
   });
 
-  // Método para converter o documento do Firestore para a classe Workout
   factory Workout.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 

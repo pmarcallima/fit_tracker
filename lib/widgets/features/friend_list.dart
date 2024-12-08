@@ -1,13 +1,13 @@
+
 import 'package:fit_tracker/services/models/friends.dart';
-import 'package:fit_tracker/services/models/statistics.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/services/providers/firebase_helper.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/utils/global_context.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:fit_tracker/widgets/features/friend_data.dart';
 
 class FriendsListPage extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class FriendsListPage extends StatefulWidget {
 }
 
 class _FriendsListPageState extends State<FriendsListPage> {
-  final ImagePicker _picker = ImagePicker();
+  final FirebaseService _firebaseService = FirebaseService();
   List<Friends> friends = [];
   bool isLoading = true;
 
@@ -26,19 +26,25 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   Future<void> _loadFriends() async {
-    final dbHelper = FirebaseService();
-    User? user = await dbHelper.getUserById(GlobalContext.userId!);
+    try {
+      User? user = await _firebaseService.getUserById(GlobalContext.userId!);
 
-    if (user != null) {
-      List<Friends> loadedFriends = await dbHelper.getFriendList(user);
+      if (user != null) {
+        List<Friends> loadedFriends = await _firebaseService.getFriendList(user);
+        setState(() {
+          friends = loadedFriends;
+          isLoading = false;
+        });
+      } else {
+        print("Usuário não encontrado.");
+        setState(() {
+          friends = [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Erro ao carregar amigos: $e");
       setState(() {
-        friends = loadedFriends;
-        isLoading = false;
-      });
-    } else {
-      print("Usuário não encontrado.");
-      setState(() {
-        friends = [];
         isLoading = false;
       });
     }
@@ -62,9 +68,10 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     child: ListView.builder(
                       itemCount: friends.length,
                       itemBuilder: (context, index) {
-                        return FriendTile(friend: friends[index], onTap: () {
-                          _showFriendDataPopup(friends[index].id);
-                        });
+                        return ListTile(
+                          title: Text(friends[index].name),
+                          onTap: () => _showFriendDataPopup(friends[index].id),
+                        );
                       },
                     ),
                   ),
@@ -90,7 +97,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: FriendData(friendId: friendId),
+          child: FriendData(),
         );
       },
     );
@@ -129,12 +136,19 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                QrImage(
-                  data: GlobalContext.userId!,
-                  version: QrVersions.auto,
-                  size: 150.0,
-                  foregroundColor: pBlack,
-                ),
+QrImageView(
+  data: GlobalContext.userId!, // Substituímos QrImage por QrImageView
+  version: QrVersions.auto,
+  size: 150.0,
+  eyeStyle: const QrEyeStyle(
+    eyeShape: QrEyeShape.square,
+    color: pBlack,
+  ),
+  dataModuleStyle: const QrDataModuleStyle(
+    dataModuleShape: QrDataModuleShape.square,
+    color: pBlack,
+  ),
+),
                 SizedBox(height: 16),
                 Text(
                   'Ou leia um QR Code para adicionar um amigo',
@@ -173,7 +187,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 }
 
 class QRCodeScannerPage extends StatelessWidget {
-  final FirebaseService dbHelper = FirebaseService();
+  final FirebaseService firebaseService = FirebaseService();
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +203,7 @@ class QRCodeScannerPage extends StatelessWidget {
             if (scannedId.isNotEmpty) {
               controller.dispose();
 
-              await dbHelper.addFriend(scannedId);
+              await firebaseService.addFriend(scannedId);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Amigo adicionado com sucesso!')),
