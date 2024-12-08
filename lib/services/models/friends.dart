@@ -1,6 +1,6 @@
 
 class Friends {
-  final int id;
+  final String id;
   final String name;
   final int streakDays;
   final bool hasStreak;
@@ -17,7 +17,7 @@ class Friends {
   }
 }
 class Friend {
-  final int? id;
+  final String? id;
 
   Friend({this.id});
 

@@ -1,6 +1,6 @@
 import 'dart:ffi';
 
 class GlobalContext {
-  static int? friendId;
-  static int? userId;
+  static String? friendId;
+  static String? userId;
 }

@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Workout {
-  final int? id;
+  final String? id;
   String? name;
   final Uint8List? workoutPicture;
-  final int userId;
+  final String userId;
 
   Workout({
     this.id,

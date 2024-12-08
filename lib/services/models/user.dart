@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class User {
 
 
-	int? id;
+	String? id;
 	String email;
 	String? firstName;
 	String? lastName;
@@ -24,7 +24,7 @@ class User {
 	});
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      id: map['id'] as int?,
+      id: map['id'] as String?,
       email: map['email'] as String,
       password: map['password'] as String,
       firstName: map['firstName'] as String?,

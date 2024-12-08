@@ -16,7 +16,7 @@ class PersonalData extends StatelessWidget {
     return _buildUserData(userId, context);
   }
 
-  Widget _buildUserData(int userId, BuildContext context) {
+  Widget _buildUserData(String userId, BuildContext context) {
     final dbHelper = DatabaseHelper();
     var screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(

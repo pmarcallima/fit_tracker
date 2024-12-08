@@ -1,9 +1,7 @@
-
-
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:fit_tracker/utils/images.dart';
 import 'package:flutter/material.dart';
-import 'package:fit_tracker/services/providers/database_helper.dart'; // Importar seu DatabaseHelper
+import 'package:fit_tracker/services/providers/firebase_helper.dart'; // Importar seu DatabaseHelper
 import 'package:fit_tracker/services/models/statistics.dart'; // Importar seu modelo Statistic
 import 'package:fit_tracker/services/models/user.dart'; // Importar seu modelo User
 import 'package:fit_tracker/utils/global_context.dart'; // Importar o Provider para acessar o GlobalContext
@@ -19,7 +17,7 @@ class FriendData extends StatelessWidget {
   }
 
   Widget _buildUserData(int userId, BuildContext context) {
-  final dbHelper = DatabaseHelper();
+  final dbHelper = FirebaseService();
     var screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Container(
