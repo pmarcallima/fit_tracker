@@ -7,7 +7,7 @@ class FirestoreHelper {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // Carregar todos os treinos de um usuário
-  Future<List<Workout>> getAllWorkoutsByUserId(int userId) async {
+  Future<List<Workout>> getAllWorkoutsByUserId(String userId) async {
     var snapshot = await _db
         .collection('workouts')
         .where('userId', isEqualTo: userId)
@@ -18,7 +18,7 @@ class FirestoreHelper {
   }
 
   // Atualizar estatísticas de um usuário
-  Future<void> updateUserStatistics(int userId, DateTime lastWorkoutDate, int totalWorkouts, int currentStreak, int biggestStreak) async {
+  Future<void> updateUserStatistics(String userId, DateTime lastWorkoutDate, int totalWorkouts, int currentStreak, int biggestStreak) async {
     await _db.collection('users').doc(userId.toString()).update({
       'lastWorkoutDate': lastWorkoutDate,
       'totalWorkouts': totalWorkouts,
@@ -43,7 +43,7 @@ class FirestoreHelper {
   }
 
   // Obter exercícios de um treino
-  Future<List<Exercise>> getExercisesByWorkoutId(int workoutId) async {
+  Future<List<Exercise>> getExercisesByWorkoutId(String workoutId) async {
     var snapshot = await _db
         .collection('exercises')
         .where('workoutId', isEqualTo: workoutId)

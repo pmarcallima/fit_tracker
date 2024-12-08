@@ -83,7 +83,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
     );
   }
 
-  void _showFriendDataPopup(int friendId) {
+  void _showFriendDataPopup(String friendId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -186,7 +186,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
 
 class FriendData extends StatelessWidget {
-  final int friendId;
+  final String friendId;
 
   FriendData({required this.friendId});
 

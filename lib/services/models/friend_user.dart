@@ -1,7 +1,7 @@
 
 class FriendUser {
-  final int friendId;
-  final int userId;
+  final String friendId;
+  final String userId;
 
   FriendUser({
     required this.friendId,

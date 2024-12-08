@@ -6,7 +6,7 @@ class Statistic {
   int currentStreak;
   int biggestStreak;
   int totalFriends;
-  int userId;
+  String userId;
 
   Statistic({
     this.lastWorkout,
