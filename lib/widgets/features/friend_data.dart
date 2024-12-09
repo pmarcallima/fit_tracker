@@ -1,4 +1,3 @@
-
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/services/providers/firebase_helper.dart';
@@ -10,7 +9,7 @@ import 'package:fit_tracker/widgets/features/friend_data.dart';
 class FriendData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final friendId = GlobalContext.friendId!; // Obtém o ID do amigo do contexto global
+    final friendId = GlobalContext.friendId!;
 
     return _buildUserData(friendId, context);
   }
@@ -45,7 +44,8 @@ class FriendData extends StatelessWidget {
                     return Center(child: CircularProgressIndicator());
                   }
                   if (userSnapshot.hasError) {
-                    return Center(child: Text('Erro ao carregar dados do usuário'));
+                    return Center(
+                        child: Text('Erro ao carregar dados do usuário'));
                   }
                   final user = userSnapshot.data;
                   if (user == null) {
@@ -55,28 +55,31 @@ class FriendData extends StatelessWidget {
                   return FutureBuilder<Statistic?>(
                     future: dbHelper.getStatisticsByUserId(friendId),
                     builder: (context, statsSnapshot) {
-                      if (statsSnapshot.connectionState == ConnectionState.waiting) {
+                      if (statsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
                       if (statsSnapshot.hasError) {
-                        return Center(child: Text('Erro ao carregar estatísticas'));
+                        return Center(
+                            child: Text('Erro ao carregar estatísticas'));
                       }
                       final statistics = statsSnapshot.data;
                       if (statistics == null) {
-                        return Center(child: Text('Estatísticas não disponíveis.'));
+                        return Center(
+                            child: Text('Estatísticas não disponíveis.'));
                       }
 
                       DateTime? birthDateMilliseconds = user.birthDate;
 
                       return Column(
                         children: [
-                          _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
-
-_buildProfileTile(
-  'DATA DE NASCIMENTO',
-  '${DateTime.fromMillisecondsSinceEpoch((birthDateMilliseconds ?? 0) as int).toLocal()}'.split(' ')[0],
-),
-                          _buildProfileTile('EMAIL', user.email),
+                          _buildProfileTile(
+                              'NOME', '${user.firstName} ${user.lastName}'),
+                          _buildProfileTile(
+                            'DATA DE NASCIMENTO',
+                            '${DateTime.fromMillisecondsSinceEpoch((birthDateMilliseconds ?? 0) as int).toLocal()}'
+                                .split(' ')[0],
+                          ),
                           _buildStatisticsTile(statistics),
                         ],
                       );
@@ -85,8 +88,6 @@ _buildProfileTile(
                 },
               ),
             ),
-            const SizedBox(height: 30),
-            _buildEditButton(context),
           ],
         ),
       ),
@@ -136,10 +137,11 @@ _buildProfileTile(
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatText('Maior Sequência de Treinos: ${statistics.biggestStreak}', pLightRed),
-            _buildStatText('Treinos Concluídos: ${statistics.totalWorkouts}', pLightRed),
-            _buildStatText('ID do Usuário: ${statistics.userId}', pLightRed),
-            _buildStatText('Número de Amigos: ${statistics.totalFriends}', pLightRed),
+            _buildStatText(
+                'Maior Sequência de Treinos: ${statistics.biggestStreak}',
+                pLightRed),
+            _buildStatText(
+                'Treinos Concluídos: ${statistics.totalWorkouts}', pLightRed),
           ],
         ),
       ),

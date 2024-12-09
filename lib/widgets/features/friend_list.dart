@@ -1,3 +1,4 @@
+
 import 'package:fit_tracker/services/models/friends.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/services/providers/firebase_helper.dart';
@@ -68,9 +69,36 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     child: ListView.builder(
                       itemCount: friends.length,
                       itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(friends[index].name),
-                          onTap: () => _showFriendDataPopup(friends[index].id),
+                        var friend = friends[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            tileColor: pWhite,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            title: Row(
+                              children: [
+                                Text(
+                                  friend.name,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: pBlack,
+                                  ),
+                                ),
+                                if (friend.hasStreak)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Icon(
+                                      Icons.local_fire_department,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            onTap: () => _showFriendDataPopup(friend.id),
+                          ),
                         );
                       },
                     ),
@@ -90,6 +118,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   void _showFriendDataPopup(String friendId) {
+    GlobalContext.friendId = friendId;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -191,7 +220,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       if (user != null) {
                         if (user.id != null) {
                           await _firebaseService.addFriend(user.id!);
-                          Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content: Text('Amigo adicionado com sucesso!')),

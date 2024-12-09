@@ -1,3 +1,4 @@
+import 'package:fit_tracker/services/providers/firebase_helper.dart';
 import 'package:fit_tracker/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:fit_tracker/services/models/user.dart' as model;
@@ -12,6 +13,8 @@ class RegisterInput extends StatefulWidget {
 }
 
 class _RegisterInputState extends State<RegisterInput> {
+
+  final FirebaseService _firebaseService = FirebaseService();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
@@ -45,16 +48,13 @@ if (_formKey.currentState!.validate()) {
   }
 
   try {
-    // Primeiro, crie o usuário no Firebase Auth
     final auth.UserCredential userCredential = await auth.FirebaseAuth.instance
         .createUserWithEmailAndPassword(
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
     );
 
-    // Verifique se o usuário foi criado com sucesso
     if (userCredential.user != null) {
-      // Crie um mapa com os dados do usuário
       final userData = {
         'uid': userCredential.user!.uid,
         'name': _nameController.text,
@@ -62,14 +62,13 @@ if (_formKey.currentState!.validate()) {
         'birthdate': _selectedDate!.millisecondsSinceEpoch,
         'email': _emailController.text.trim(),
       };
+      _firebaseService.createUserStatistics(userCredential.user!.uid);
 
-      // Salve os dados no Firestore
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
           .set(userData);
 
-      // Limpe os campos
       _nameController.clear();
       _surnameController.clear();
       _birthdateController.clear();
@@ -83,7 +82,6 @@ if (_formKey.currentState!.validate()) {
         SnackBar(content: Text('Usuário registrado com sucesso!')),
       );
 
-      // Navegue para a próxima tela
       Navigator.pushNamed(context, '/home');
     }
   } on auth.FirebaseAuthException catch (e) {

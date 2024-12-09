@@ -34,8 +34,8 @@ Future<User?> getUserById(String uid) async {
           ? DateTime.parse(userData!['birthDate'])
           : null,
       password: userData?['password'] ?? '',
-      firstName: userData?['firstName'] ?? '',
-      lastName: userData?['lastName'] ?? '',
+      firstName: userData?['name'] ?? '',
+      lastName: userData?['surname'] ?? '',
     );
   } catch (e) {
     print("Erro ao buscar usuário: $e");
@@ -171,6 +171,33 @@ Future<Statistic> getStatisticsByUserId(String userId) async {
     await _firestore.collection('friends_has_users').add(friendUser.toMap());
   }
 
+Future<void> createUserStatistics(String userId) async {
+  try {
+    // Definindo os dados iniciais para o usuário
+    Statistic statistic = Statistic(
+      userId: userId,
+      totalWorkouts: 0,        // Inicia com 0 treinos
+      currentStreak: 0,        // Inicia com 0 streak
+      biggestStreak: 0,        // Inicia com 0 maior streak
+      totalFriends: 0,         // Inicia com 0 amigos
+      lastWorkout: null,       // Inicializa como nulo, pois o usuário ainda não fez nenhum treino
+    );
+
+    // Convertendo o objeto Statistic para Map
+    Map<String, dynamic> statisticData = statistic.toMap();
+
+    // Referência para a coleção 'userStatistics' no Firestore
+    await FirebaseFirestore.instance
+        .collection('userStatistics')
+        .doc(userId)  // Usando o userId para criar o documento com o ID do usuário
+        .set(statisticData);  // Criando o documento com os dados iniciais
+
+    print("Estatísticas do usuário $userId criadas com sucesso!");
+  } catch (e) {
+    print("Erro ao criar estatísticas para o usuário $userId: $e");
+  }
+}
+
   // ======================
   // Métodos para Treinos
   // ======================
@@ -218,14 +245,40 @@ Future<Statistic> getStatisticsByUserId(String userId) async {
 // ======================
 
 /// Obtém a lista de amigos de um usuário
+
 Future<List<Friends>> getFriendList(User user) async {
   try {
     final snapshot = await _firestore
-        .collection('friends')
-        .where('userId', isEqualTo: user.id)
+        .collection('friends_has_users')
+        .where('users_id', isEqualTo: user.id)
         .get();
 
-    return snapshot.docs.map((doc) => Friends.fromMap(doc.data())).toList();
+    print("Amigos encontrados: ");
+    snapshot.docs.forEach((doc) {
+      print(doc.data()); 
+    });
+
+    List<Friends> friendsList = [];
+    for (var doc in snapshot.docs) {
+      FriendUser friendUser = FriendUser.fromMap(doc.data());
+
+      var friendSnapshot = await _firestore.collection('users').doc(friendUser.friendId).get();
+
+      if (friendSnapshot.exists) {
+        var friendData = friendSnapshot.data();
+        Friends friend = Friends(
+          id: friendUser.friendId,  
+          name: friendData?['name'] ?? '',
+          hasStreak: true,
+          streakDays: 3,
+        );
+
+        friendsList.add(friend);
+      }
+    }
+
+
+    return friendsList;  
   } catch (e) {
     print("Erro ao carregar amigos: $e");
     return [];

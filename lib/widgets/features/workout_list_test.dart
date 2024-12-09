@@ -32,7 +32,7 @@ void initState() {
 Future<void> _loadUserStatistics() async {
   var userStatsDoc = await _firestore
       .collection('userStatistics')
-      .doc("oi")
+      .doc(GlobalContext.userId)
       .get();
 
   if (userStatsDoc.exists) {
@@ -79,7 +79,7 @@ void _onButtonPressed() async {
     lastWorkoutDate = today;
   });
 
-  await _firestore.collection('userStatistics').doc("oi").set({
+  await _firestore.collection('userStatistics').doc(GlobalContext.userId).set({
     'lastWorkout': today,
     'totalWorkouts': totalWorkouts,
     'currentStreak': currentStreak,

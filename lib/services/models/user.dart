@@ -20,28 +20,26 @@ class User {
     this.profilePicture,
   });
 
-  // Método para criar um objeto User a partir de um Map
   factory User.fromMap(Map<String, dynamic> data) {
     return User(
-      id: data['uid'], // Aqui assumimos que o campo de ID no Firestore é 'uid'
+      id: data['uid'], 
       email: data['email'],
-      firstName: data['firstName'],  // Mapeando 'firstName'
-      lastName: data['lastName'],    // Mapeando 'lastName'
+      firstName: data['name'],  
+      lastName: data['surname'],    
       password: data['password'],
-      birthDate: data['birthDate'] != null ? DateTime.fromMillisecondsSinceEpoch(data['birthDate']) : null, // Convertendo timestamp para DateTime
-      profilePicture: data['profilePicture'], // Caso o profilePicture seja um Uint8List armazenado
+      birthDate: data['birthDate'] != null ? DateTime.fromMillisecondsSinceEpoch(data['birthDate']) : null, 
+      profilePicture: data['profilePicture'], 
     );
   }
 
-  // Método para converter o objeto User de volta para um Map
   Map<String, dynamic> toMap() {
     return {
       'uid': id,
       'email': email,
-      'firstName': firstName,
-      'lastName': lastName,
+      'name': firstName,
+      'surname': lastName,
       'password': password,
-      'birthDate': birthDate?.millisecondsSinceEpoch, // Convertendo DateTime para timestamp
+      'birthDate': birthDate?.millisecondsSinceEpoch, 
       'profilePicture': profilePicture,
     };
   }

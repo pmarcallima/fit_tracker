@@ -21,24 +21,20 @@ class _CustomFormWidgetState extends State<CustomFormWidget> {
       String password = _passwordController.text.trim();
 
       try {
-        // Tenta fazer login no Firebase Authentication
         UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        // Caso o login seja bem-sucedido, armazena o ID do usuário
         User? user = userCredential.user;
         if (user != null) {
           GlobalContext.userId = user.uid;  // Armazena o ID do usuário no contexto global
 
-          // Navega para a tela de workouts
           Navigator.pushReplacementNamed(context, '/workouts');
         } else {
           _showErrorDialog('Erro ao autenticar usuário');
         }
       } on FirebaseAuthException catch (e) {
-        // Lida com erros específicos do Firebase Auth
         if (e.code == 'user-not-found') {
           _showErrorDialog('Usuário não encontrado');
         } else if (e.code == 'wrong-password') {

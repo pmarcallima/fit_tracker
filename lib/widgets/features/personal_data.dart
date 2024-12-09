@@ -69,9 +69,10 @@ class PersonalData extends StatelessWidget {
                         DateTime.fromMillisecondsSinceEpoch(birthDateMilliseconds),
                       );
 
+                      print(user.firstName);
                       return Column(
                         children: [
-                          _buildProfileTile('NOME', '${user.firstName} ${user.lastName}'),
+                          _buildProfileTile('NOME', '${user.firstName}'),
                           _buildProfileTile('DATA DE NASCIMENTO', formattedBirthDate),
                           _buildProfileTile('EMAIL', user.email),
                           _buildStatisticsTile(statistics),
