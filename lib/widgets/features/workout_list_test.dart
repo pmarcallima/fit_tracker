@@ -249,16 +249,28 @@ void _addWorkout() async {
   await _firestore.collection('workouts').doc(novoTreino.id).set(novoTreino.toMap());
 }
 Future<void> _addExercise(String workoutId) async {
+  // Consulta para encontrar o maior ID existente na coleção de exercícios
+  var snapshot = await _firestore.collection('exercises').get();
+  int nextId = 1;
+
+  if (snapshot.docs.isNotEmpty) {
+    // Encontra o maior ID existente na coleção
+    nextId = snapshot.docs
+        .map((doc) => int.tryParse(doc.id) ?? 0) // Tenta converter os IDs para inteiros
+        .reduce((curr, next) => curr > next ? curr : next) + 1;
+  }
+
+  // Cria o novo exercício com o próximo ID como String e associando ao workoutId
   var novoExercicio = Exercise(
-    workoutId: workoutId,
-    id: "teste",
+    workoutId: workoutId, // Relacionado ao workout
+    id: nextId.toString(),
     name: '',
     description: '',
   );
 
-  await _firestore.collection('exercises').add(novoExercicio.toMap());
+  // Adiciona o novo exercício ao Firestore
+  await _firestore.collection('exercises').doc(novoExercicio.id).set(novoExercicio.toMap());
 }
-
 void _removeWorkout(String workoutId) async {
   await _firestore.collection('workouts').doc(workoutId).delete();
   
@@ -349,8 +361,7 @@ void _showWorkoutPopup(BuildContext context, Workout workout, int workoutIndex) 
                   ElevatedButton(
                     onPressed: () async {
                       if (workout.id != null) {
-                        //await _addExercise(workout.id!);
-await _addExercise("1");
+                        await _addExercise(workout.id!);
                         setState(() {});
                       }
                     },
@@ -368,8 +379,7 @@ await _addExercise("1");
                         workout.name = workoutController.text;
                         await _firestore
                             .collection('workouts')
-                            //.doc(workout.id)
-                            .doc("oi")
+                            .doc(workout.id)
                             .update({'name': workout.name});
                       }
                       Navigator.of(context).pop();
@@ -488,8 +498,7 @@ Widget build(BuildContext context) {
                         ),
                         trailing: IconButton(
                           icon: Icon(Icons.delete, color: pDarkerRed),
-                          //onPressed: () => _removeWorkout(workout.id!),
-                          onPressed: () => _removeWorkout("oi"),
+                          onPressed: () => _removeWorkout(workout.id!),
                         ),
                         onTap: () => _showWorkoutPopup(context, workout, index),
                       ),

@@ -1,4 +1,3 @@
-
 import 'package:fit_tracker/services/models/friends.dart';
 import 'package:fit_tracker/services/models/user.dart';
 import 'package:fit_tracker/services/providers/firebase_helper.dart';
@@ -30,7 +29,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
       User? user = await _firebaseService.getUserById(GlobalContext.userId!);
 
       if (user != null) {
-        List<Friends> loadedFriends = await _firebaseService.getFriendList(user);
+        List<Friends> loadedFriends =
+            await _firebaseService.getFriendList(user);
         setState(() {
           friends = loadedFriends;
           isLoading = false;
@@ -104,6 +104,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   void _showInviteModal(BuildContext context) {
+    final TextEditingController nameController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -126,7 +128,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     color: pDarkerRed,
                   ),
                 ),
-                SizedBox(height: 16),
                 Text(
                   'Compartilhe seu QR Code',
                   style: TextStyle(
@@ -135,21 +136,19 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     color: pBlack,
                   ),
                 ),
-                SizedBox(height: 16),
-QrImageView(
-  data: GlobalContext.userId!, // Substituímos QrImage por QrImageView
-  version: QrVersions.auto,
-  size: 150.0,
-  eyeStyle: const QrEyeStyle(
-    eyeShape: QrEyeShape.square,
-    color: pBlack,
-  ),
-  dataModuleStyle: const QrDataModuleStyle(
-    dataModuleShape: QrDataModuleShape.square,
-    color: pBlack,
-  ),
-),
-                SizedBox(height: 16),
+                QrImageView(
+                  data: GlobalContext.userId!,
+                  version: QrVersions.auto,
+                  size: 150.0,
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: pBlack,
+                  ),
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.square,
+                    color: pBlack,
+                  ),
+                ),
                 Text(
                   'Ou leia um QR Code para adicionar um amigo',
                   style: TextStyle(
@@ -158,13 +157,69 @@ QrImageView(
                     color: pBlack,
                   ),
                 ),
-                SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => _scanQRCode(),
                   icon: Icon(Icons.qr_code_scanner),
                   label: Text('Ler QR Code'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: pLightRed,
+                    foregroundColor: pWhite,
+                  ),
+                ),
+                Text(
+                  'Ou procure um amigo pelo nome',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: pBlack,
+                  ),
+                ),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nome do amigo',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    String name = nameController.text.trim();
+                    print("chegou aqui");
+                    if (name.isNotEmpty) {
+                      User? user = await _firebaseService.getUserByName(name);
+                      if (user != null) {
+                        if (user.id != null) {
+                          await _firebaseService.addFriend(user.id!);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Amigo adicionado com sucesso!')),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('ID de usuário inválido!')),
+                          );
+                        }
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Amigo adicionado com sucesso!')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Usuário não encontrado!')),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Digite o nome do amigo!')),
+                      );
+                    }
+                  },
+                  child: Text('Adicionar Amigo'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: pRed,
                     foregroundColor: pWhite,
                   ),
                 ),

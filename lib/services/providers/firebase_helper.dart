@@ -16,30 +16,57 @@ class FirebaseService {
   // ======================
 
   /// Obtém um usuário pelo ID (Firestore)
-  Future<User?> getUserById(String id) async {
-    try {
-      final userDoc = await _firestore.collection('users').doc(id).get();
 
-      if (!userDoc.exists) {
-        return null; // Retorna null se o usuário não for encontrado
-      }
+Future<User?> getUserById(String uid) async {
+    print(uid);
+  try {
+    final userDoc = await _firestore.collection('users').doc(uid).get();
 
-      final userData = userDoc.data();
-      return User(
-        id: id,
-        email: userData?['email'] ?? '',
-        birthDate: userData?['birthDate'] != null
-            ? DateTime.parse(userData!['birthDate'])
-            : null,
-        password: userData?['password'] ?? '',
-        firstName: userData?['firstName'] ?? '',
-        lastName: userData?['lastName'] ?? '',
-      );
-    } catch (e) {
-      print("Erro ao buscar usuário: $e");
-      return null;
+    if (!userDoc.exists) {
+      return null; 
     }
+
+    final userData = userDoc.data();
+    return User(
+      id: uid,  
+      email: userData?['email'] ?? '',
+      birthDate: userData?['birthDate'] != null
+          ? DateTime.parse(userData!['birthDate'])
+          : null,
+      password: userData?['password'] ?? '',
+      firstName: userData?['firstName'] ?? '',
+      lastName: userData?['lastName'] ?? '',
+    );
+  } catch (e) {
+    print("Erro ao buscar usuário: $e");
+    return null;
   }
+}
+
+Future<User?> getUserByName(String name) async {
+  try {
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('name', isEqualTo: name)
+        .limit(1)
+        .get();
+
+    print("Consulta realizada. Documentos encontrados: ${querySnapshot.docs.length}");
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var userData = querySnapshot.docs.first.data();
+      print("Dados do usuário encontrados: $userData");
+      
+      return User.fromMap(userData);  
+    } else {
+      print("Nenhum usuário encontrado com o nome: $name");
+      return null;  
+    }
+  } catch (e) {
+    print("Erro ao buscar usuário: $e");
+    return null;
+  }
+}
 
   /// Atualiza os dados de um usuário
   Future<void> updateUser(User updatedUser) async {

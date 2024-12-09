@@ -22,7 +22,7 @@ class PersonalData extends StatelessWidget {
     var screenSize = MediaQuery.of(context).size;
     return SingleChildScrollView(
       child: Container(
-        height: screenSize.height - 230,
+        height: screenSize.height - 212,
         width: screenSize.width / 1.2,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -82,7 +82,6 @@ class PersonalData extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 30),
             _buildEditButton(context, userId),
           ],
         ),
@@ -136,7 +135,6 @@ class PersonalData extends StatelessWidget {
             _buildStatText('Maior Sequência de treinos: ${statistics.biggestStreak}', pLightRed),
             _buildStatText('Treinos concluídos: ${statistics.totalWorkouts}', pLightRed),
             _buildStatText('Último treino: ${_formatLastWorkout(statistics.lastWorkout)}', pLightRed),
-            _buildStatText('Número de amigos: ${statistics.totalFriends}', pLightRed),
           ],
         ),
       ),
