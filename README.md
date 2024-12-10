@@ -1,5 +1,11 @@
 # FitTracker
 
+**Equipe:**  
+Fábio Antônio, Lucas Alkmim, Pedro Marçal, Pedro Ribeiro  
+
+**Professor:**  
+Ilo Rivero  
+
 ## Contextualização
 
 João é um jovem que decidiu levar sua saúde física mais a sério. Com uma rotina agitada, ele frequentemente esquecia quais exercícios deveria fazer ou como estava progredindo em seus treinos. Além disso, faltava aquela motivação extra para manter a consistência, especialmente quando treinava sozinho.
